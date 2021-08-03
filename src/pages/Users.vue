@@ -1,21 +1,314 @@
 <template>
   <q-page :style-fn="myTweak" padding>
-    <h1>This is my users page</h1>
+    <div class="container flex column">
+      <div class="row justify-start">
+        <div class="column">
+          <h4>USUARIOS</h4>
+        </div>
+      </div>
+      <div class="row justify-start">
+        <q-btn
+          color="primary"
+          icon="person_add_alt"
+          label="Crear Nuevo"
+          @click="onClick"
+        />
+      </div>
+      <div class="row">
+        <div class="q-py-md user-table">
+          <q-table
+            title="Treats"
+            :rows="rows"
+            :columns="columns"
+            row-key="id"
+            :filter="filter"
+            :loading="loading"
+            :rows-per-page-options="[10]"
+          >
+            <template v-slot:top>
+              <q-btn
+                color="primary"
+                :disable="loading"
+                label="Add row"
+                @click="addRow"
+              />
+              <q-btn
+                class="q-ml-sm"
+                color="primary"
+                :disable="loading"
+                label="Remove row"
+                @click="removeRow"
+              />
+              <q-space />
+              <q-input
+                borderless
+                dense
+                debounce="300"
+                color="primary"
+                v-model="filter"
+              >
+                <template v-slot:append>
+                  <q-icon name="search" />
+                </template>
+              </q-input>
+            </template>
+          </q-table>
+        </div>
+      </div>
+    </div>
+    <q-dialog v-model="isDialogOpen" persistent>
+      <q-card style="min-width: 350px">
+        <q-card-section>
+          <div class="text-h6">Creating a new user...</div>
+        </q-card-section>
+
+        <q-card-section class="q-pt-none">
+          <q-input
+            dense
+            v-model="addressTest"
+            autofocus
+            @keyup.enter="isDialogOpen = false"
+          />
+        </q-card-section>
+
+        <q-card-actions align="right" class="text-primary">
+          <q-btn flat label="Cancel" v-close-popup />
+          <q-btn flat label="Crear Nuevo" v-close-popup />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
 <script>
+import { ref } from "vue";
+
+const columns = [
+  {
+    name: "name",
+    required: true,
+    label: "Dessert (100g serving)",
+    align: "left",
+    field: (row) => row.name,
+    format: (val) => `${val}`,
+    sortable: true,
+  },
+  {
+    name: "calories",
+    align: "center",
+    label: "Calories",
+    field: "calories",
+    sortable: true,
+  },
+  { name: "fat", label: "Fat (g)", field: "fat", sortable: true },
+  { name: "carbs", label: "Carbs (g)", field: "carbs" },
+  { name: "protein", label: "Protein (g)", field: "protein" },
+  { name: "sodium", label: "Sodium (mg)", field: "sodium" },
+  {
+    name: "calcium",
+    label: "Calcium (%)",
+    field: "calcium",
+    sortable: true,
+    sort: (a, b) => parseInt(a, 10) - parseInt(b, 10),
+  },
+  {
+    name: "iron",
+    label: "Iron (%)",
+    field: "iron",
+    sortable: true,
+    sort: (a, b) => parseInt(a, 10) - parseInt(b, 10),
+  },
+];
+
+const originalRows = [
+  {
+    name: "Frozen Yogurt",
+    calories: 159,
+    fat: 6.0,
+    carbs: 24,
+    protein: 4.0,
+    sodium: 87,
+    calcium: "14%",
+    iron: "1%",
+  },
+  {
+    name: "Ice cream sandwich",
+    calories: 237,
+    fat: 9.0,
+    carbs: 37,
+    protein: 4.3,
+    sodium: 129,
+    calcium: "8%",
+    iron: "1%",
+  },
+  {
+    name: "Eclair",
+    calories: 262,
+    fat: 16.0,
+    carbs: 23,
+    protein: 6.0,
+    sodium: 337,
+    calcium: "6%",
+    iron: "7%",
+  },
+  {
+    name: "Cupcake",
+    calories: 305,
+    fat: 3.7,
+    carbs: 67,
+    protein: 4.3,
+    sodium: 413,
+    calcium: "3%",
+    iron: "8%",
+  },
+  {
+    name: "Gingerbread",
+    calories: 356,
+    fat: 16.0,
+    carbs: 49,
+    protein: 3.9,
+    sodium: 327,
+    calcium: "7%",
+    iron: "16%",
+  },
+  {
+    name: "Jelly bean",
+    calories: 375,
+    fat: 0.0,
+    carbs: 94,
+    protein: 0.0,
+    sodium: 50,
+    calcium: "0%",
+    iron: "0%",
+  },
+  {
+    name: "Lollipop",
+    calories: 392,
+    fat: 0.2,
+    carbs: 98,
+    protein: 0,
+    sodium: 38,
+    calcium: "0%",
+    iron: "2%",
+  },
+  {
+    name: "Honeycomb",
+    calories: 408,
+    fat: 3.2,
+    carbs: 87,
+    protein: 6.5,
+    sodium: 562,
+    calcium: "0%",
+    iron: "45%",
+  },
+  {
+    name: "Donut",
+    calories: 452,
+    fat: 25.0,
+    carbs: 51,
+    protein: 4.9,
+    sodium: 326,
+    calcium: "2%",
+    iron: "22%",
+  },
+  {
+    name: "KitKat",
+    calories: 518,
+    fat: 26.0,
+    carbs: 65,
+    protein: 7,
+    sodium: 54,
+    calcium: "12%",
+    iron: "6%",
+  },
+];
+
 export default {
   setup() {
-    
+    // test variables for table
+    const loading = ref(false);
+    const filter = ref("");
+    const rowCount = ref(10);
+    const rows = ref([...originalRows]);
+    // end test variables for table
+
+    let isDialogOpen = ref(false);
+    let addressTest = ref("");
     // function of quasar framework, you can find this in the documentation.
     function myTweak(offset) {
       return { minHeight: offset ? `calc(100vh - ${offset}px` : "100vh" };
     }
 
+    function onClick() {
+      console.log("this is clicked!");
+      isDialogOpen.value = !isDialogOpen.value;
+    }
+
     return {
+      isDialogOpen,
+      addressTest,
       myTweak,
+      onClick,
+      // returning variables for table
+      columns,
+      rows,
+
+      loading,
+      filter,
+      rowCount,
+
+      // emulate fetching data from server
+      addRow() {
+        loading.value = true;
+        setTimeout(() => {
+          const index = Math.floor(Math.random() * (rows.value.length + 1)),
+            row = originalRows[Math.floor(Math.random() * originalRows.length)];
+
+          if (rows.value.length === 0) {
+            rowCount.value = 0;
+          }
+
+          row.id = ++rowCount.value;
+          const newRow = { ...row }; // extend({}, row, { name: `${row.name} (${row.__count})` })
+          rows.value = [
+            ...rows.value.slice(0, index),
+            newRow,
+            ...rows.value.slice(index),
+          ];
+          loading.value = false;
+        }, 500);
+      },
+
+      removeRow() {
+        loading.value = true;
+        setTimeout(() => {
+          const index = Math.floor(Math.random() * rows.value.length);
+          rows.value = [
+            ...rows.value.slice(0, index),
+            ...rows.value.slice(index + 1),
+          ];
+          loading.value = false;
+        }, 500);
+      },
+      // end returning variables for table
     };
   },
 };
 </script>
+
+<style lang="scss" scoped>
+.container {
+  padding: 0 0.5rem;
+  h4 {
+    margin: 1rem 0;
+    margin-top: 2rem;
+  }
+  button {
+    margin-top: 1rem;
+  }
+  .user-table{
+    width: 100%;
+    max-width: 1400px;
+  }
+}
+</style>

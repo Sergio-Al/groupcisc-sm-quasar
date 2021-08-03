@@ -12,7 +12,7 @@
         />
 
         <q-toolbar-title class="text-weight-medium q-px-md q-pr-lg">
-          GroupCisc SM
+          My-Company System
         </q-toolbar-title>
 
         <div>
