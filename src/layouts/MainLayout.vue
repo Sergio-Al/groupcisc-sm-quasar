@@ -194,9 +194,7 @@ export default defineComponent({
       componentName === componentSelected.value;
 
     function selectComponent(componentName) {
-      console.log("this is entering");
       componentSelected.value = componentName;
-      console.log(componentSelected.value);
     }
 
     return {

@@ -1,16 +1,17 @@
 <template>
-  <q-page class="q-pa-lg" style="width: 100%">
+  <q-page class="q-pa-lg q-mx-auto" style="width: 100%">
     <div class="container">
       <div class="row">
         <div class="column">
-          <h4>USUARIOSs</h4>
+          <h4>USUARIOS</h4>
         </div>
       </div>
       <div class="row">
         <div class="column">
           <q-btn
+            :outline="isDarkModeActive"
             color="primary"
-            icon="person_add_alt"
+            icon="person_add"
             class="create-button"
             label="Crear Nuevo"
             @click="onClick"
@@ -30,19 +31,6 @@
               :rows-per-page-options="[10]"
             >
               <template v-slot:top>
-                <q-btn
-                  color="primary"
-                  :disable="loading"
-                  label="Add row"
-                  @click="addRow"
-                />
-                <q-btn
-                  class="q-ml-sm"
-                  color="primary"
-                  :disable="loading"
-                  label="Remove row"
-                  @click="removeRow"
-                />
                 <q-space />
                 <q-input
                   borderless
@@ -86,7 +74,8 @@
 </template>
 
 <script>
-import { ref } from "vue";
+import { ref, computed } from "vue";
+import { useQuasar } from "quasar";
 
 const columns = [
   {
@@ -230,6 +219,7 @@ const originalRows = [
 
 export default {
   setup() {
+    const $q = useQuasar();
     // test variables for table
     const loading = ref(false);
     const filter = ref("");
@@ -239,6 +229,9 @@ export default {
 
     let isDialogOpen = ref(false);
     let addressTest = ref("");
+
+    const isDarkModeActive = computed(() => $q.dark.isActive);
+
     // function of quasar framework, you can find this in the documentation.
     function myTweak(offset) {
       return { minHeight: offset ? `calc(100vh - ${offset}px` : "100vh" };
@@ -251,6 +244,7 @@ export default {
 
     return {
       isDialogOpen,
+      isDarkModeActive,
       addressTest,
       myTweak,
       onClick,

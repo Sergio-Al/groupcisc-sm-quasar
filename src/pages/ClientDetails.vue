@@ -6,26 +6,26 @@
           <h4>Detalles del Cliente</h4>
         </div>
       </div>
-    </div>
-    <div class="row">
-      <div class="column column-custom">
-        <q-card class="my-card q-py-md">
-          <q-card-section>
-            <div class="text-h5">Nombre del cliente</div>
-          </q-card-section>
-          <q-item clickable v-ripple>
-            <q-item-section top avatar>
-              <q-icon
-                class="q-mx-auto q-my-auto info-client-icon"
-                name="print"
-              />
-            </q-item-section>
-            <q-item-section>
-              <q-item-label>NIT</q-item-label>
-              <q-item-label caption lines="2"> Datos del nit </q-item-label>
-            </q-item-section>
-          </q-item>
-        </q-card>
+      <div class="row">
+        <div class="column column-custom">
+          <q-card class="my-card q-py-md">
+            <q-card-section>
+              <div class="text-h5">Nombre del cliente</div>
+            </q-card-section>
+            <q-item clickable v-ripple>
+              <q-item-section top avatar>
+                <q-icon
+                  class="q-mx-auto q-my-auto info-client-icon"
+                  name="print"
+                />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>NIT</q-item-label>
+                <q-item-label caption lines="2"> Datos del nit </q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-card>
+        </div>
       </div>
     </div>
   </q-page>
