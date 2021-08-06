@@ -8,14 +8,13 @@
   }
   .user-table {
     width: 100%;
-    max-width: 1400px;
   }
   .custom-column {
     width: 100%;
   }
 }
 
-@media screen and (min-width: 1450px) {
+@media screen and (min-width: 1300px) {
   .container {
     max-width: 1250px;
     margin: auto;
