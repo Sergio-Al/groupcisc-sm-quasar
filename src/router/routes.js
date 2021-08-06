@@ -25,6 +25,12 @@ const routes = [
         component: () => import("pages/Clients.vue"),
       },
       {
+        path: "clients/:id",
+        name: "SystemClientsDetails",
+        props: true,
+        component: () => import("pages/ClientDetails.vue"),
+      },
+      {
         path: "options",
         name: "SystemOptions",
         component: () => import("pages/Options.vue"),

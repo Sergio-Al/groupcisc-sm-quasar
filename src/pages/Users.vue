@@ -1,58 +1,63 @@
 <template>
-  <q-page :style-fn="myTweak" padding>
-    <div class="container flex column">
-      <div class="row justify-start">
+  <q-page class="q-pa-lg" style="width: 100%">
+    <div class="container">
+      <div class="row">
         <div class="column">
-          <h4>USUARIOS</h4>
+          <h4>USUARIOSs</h4>
         </div>
       </div>
-      <div class="row justify-start">
-        <q-btn
-          color="primary"
-          icon="person_add_alt"
-          label="Crear Nuevo"
-          @click="onClick"
-        />
+      <div class="row">
+        <div class="column">
+          <q-btn
+            color="primary"
+            icon="person_add_alt"
+            class="create-button"
+            label="Crear Nuevo"
+            @click="onClick"
+          />
+        </div>
       </div>
       <div class="row">
-        <div class="q-py-md user-table">
-          <q-table
-            title="Treats"
-            :rows="rows"
-            :columns="columns"
-            row-key="id"
-            :filter="filter"
-            :loading="loading"
-            :rows-per-page-options="[10]"
-          >
-            <template v-slot:top>
-              <q-btn
-                color="primary"
-                :disable="loading"
-                label="Add row"
-                @click="addRow"
-              />
-              <q-btn
-                class="q-ml-sm"
-                color="primary"
-                :disable="loading"
-                label="Remove row"
-                @click="removeRow"
-              />
-              <q-space />
-              <q-input
-                borderless
-                dense
-                debounce="300"
-                color="primary"
-                v-model="filter"
-              >
-                <template v-slot:append>
-                  <q-icon name="search" />
-                </template>
-              </q-input>
-            </template>
-          </q-table>
+        <div class="column custom-column">
+          <div class="q-py-md user-table">
+            <q-table
+              title="Treats"
+              :rows="rows"
+              :columns="columns"
+              row-key="id"
+              :filter="filter"
+              :loading="loading"
+              :rows-per-page-options="[10]"
+            >
+              <template v-slot:top>
+                <q-btn
+                  color="primary"
+                  :disable="loading"
+                  label="Add row"
+                  @click="addRow"
+                />
+                <q-btn
+                  class="q-ml-sm"
+                  color="primary"
+                  :disable="loading"
+                  label="Remove row"
+                  @click="removeRow"
+                />
+                <q-space />
+                <q-input
+                  borderless
+                  dense
+                  debounce="300"
+                  color="primary"
+                  v-model="filter"
+                >
+                  <template v-slot:append>
+                    <q-icon name="search" />
+                  </template>
+                </q-input>
+              </template>
+            </q-table>
+          </div>
         </div>
       </div>
     </div>
@@ -297,18 +302,5 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.container {
-  padding: 0 0.5rem;
-  h4 {
-    margin: 1rem 0;
-    margin-top: 2rem;
-  }
-  button {
-    margin-top: 1rem;
-  }
-  .user-table{
-    width: 100%;
-    max-width: 1400px;
-  }
-}
+@use '../css/table-pages';
 </style>
