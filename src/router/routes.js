@@ -38,6 +38,12 @@ const routes = [
     ],
   },
 
+  {
+    path: "/sign-up",
+    name: "SignUp",
+    component: () => import("layouts/SignUpPage.vue"),
+  },
+
   // Always leave this as last one,
   // but you can also remove it
   {

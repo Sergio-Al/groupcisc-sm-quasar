@@ -66,8 +66,9 @@
 </template>
 
 <script>
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, onMounted } from "vue";
 import { date } from "quasar";
+import { useStore } from "vuex";
 import CardInfo from "../components/CardInfo.vue";
 
 const cardData = [
@@ -97,6 +98,7 @@ export default defineComponent({
   name: "PageIndex",
   components: { CardInfo },
   setup() {
+    const $store = useStore();
     const dateToShow = ref(getTodayDate());
 
     console.log(getTodayDate());

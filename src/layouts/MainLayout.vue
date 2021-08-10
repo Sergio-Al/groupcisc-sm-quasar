@@ -179,7 +179,9 @@ const linksList = [
   },
 ];
 
-import { defineComponent, ref, computed } from "vue";
+import { defineComponent, ref, computed, onMounted } from "vue";
+import { useQuasar } from "quasar";
+import { notifyMessage } from "../composable/utils";
 
 export default defineComponent({
   name: "MainLayout",
@@ -187,8 +189,13 @@ export default defineComponent({
   components: {},
 
   setup() {
+    const $q = useQuasar();
     const leftDrawerOpen = ref(false);
     const componentSelected = ref("principal");
+
+    // onMounted(() => {
+    //   notifyMessage(5000, () => console.log("called"));
+    // });
 
     const isMyComponent = (componentName) =>
       componentName === componentSelected.value;
