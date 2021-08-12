@@ -4,16 +4,19 @@
 <script>
 import { defineComponent, onMounted } from "vue";
 import { useQuasar } from "quasar";
+import { useStore } from "vuex";
 
 export default defineComponent({
   name: "App",
   setup() {
     const $q = useQuasar();
-    // onMounted(() => {
-    //   setTimeout(() => {
-    //     $q.dark.toggle();
-    //   }, 5000);
-    // });
+    const $store = useStore();
+    onMounted(() => {
+      $store.dispatch("authModule/tryLoggin");
+      // setTimeout(() => {
+      //   $q.dark.toggle();
+      // }, 5000);
+    });
   },
 });
 </script>

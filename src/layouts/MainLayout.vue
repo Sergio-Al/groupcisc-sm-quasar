@@ -40,7 +40,7 @@
             class="text-weight-bold title"
             style="font-size: 20px; margin-top: 20px"
           >
-            User Test
+            {{ userName }}
           </div>
         </div>
       </q-img>
@@ -181,6 +181,7 @@ const linksList = [
 
 import { defineComponent, ref, computed, onMounted } from "vue";
 import { useQuasar } from "quasar";
+import { useStore } from "vuex";
 import { notifyMessage } from "../composable/utils";
 
 export default defineComponent({
@@ -190,12 +191,15 @@ export default defineComponent({
 
   setup() {
     const $q = useQuasar();
+    const $store = useStore();
+
+    const userName = ref("");
     const leftDrawerOpen = ref(false);
     const componentSelected = ref("principal");
 
-    // onMounted(() => {
-    //   notifyMessage(5000, () => console.log("called"));
-    // });
+    onMounted(() => {
+      userName.value = $store.state.authModule.userName;
+    });
 
     const isMyComponent = (componentName) =>
       componentName === componentSelected.value;
@@ -205,6 +209,7 @@ export default defineComponent({
     }
 
     return {
+      userName,
       leftDrawerOpen,
       isMyComponent,
       selectComponent,

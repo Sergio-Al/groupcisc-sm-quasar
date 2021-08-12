@@ -37,11 +37,15 @@ const routes = [
       },
     ],
   },
-
   {
     path: "/sign-up",
     name: "SignUp",
     component: () => import("layouts/SignUpPage.vue"),
+  },
+  {
+    path: "/login",
+    name: "Login",
+    component: () => import("layouts/LoginLayout.vue"),
   },
 
   // Always leave this as last one,

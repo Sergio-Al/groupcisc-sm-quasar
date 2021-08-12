@@ -57,6 +57,7 @@
         </div>
         <div class="q-mt-md">
           <q-btn
+            :loading="isRegisterLoading"
             label="Registrarse"
             type="submit"
             color="primary"
@@ -65,7 +66,7 @@
         </div>
         <p class="q-my-sm">
           Ya tienes una cuenta
-          <router-link class="text-link" to="/system"
+          <router-link class="text-link" to="/login"
             >Iniciar Sesion</router-link
           >
         </p>
@@ -76,15 +77,52 @@
 
 <script>
 import { ref } from "vue";
+import { useStore } from "vuex";
+import { useQuasar } from "quasar";
+import { useRouter } from "vue-router";
+
 export default {
   setup() {
+    const $store = useStore();
+    const $q = useQuasar();
+    const $router = useRouter();
+
     const isPwd = ref(true);
     const emailText = ref("");
     const nameText = ref("");
     const passwordText = ref("");
+    const isRegisterLoading = ref(false);
 
-    function onSubmit() {
-      console.log("success");
+    async function onSubmit() {
+      if (isRegisterLoading.value) {
+        return;
+      }
+
+      isRegisterLoading.value = true;
+      const payload = {
+        email: emailText.value,
+        name: nameText.value,
+        password: passwordText.value,
+      };
+
+      try {
+        await $store.dispatch("authModule/signUpUser", payload);
+        $q.notify({
+          message: "Correcto",
+          caption: "Se dirigira a la pantalla de inicio",
+          color: "positive",
+          icon: "check_circle",
+        });
+        $router.replace("/");
+      } catch (error) {
+        isRegisterLoading.value = false;
+        $q.notify({
+          message: "Error",
+          caption: `Ha ocurrido un error: ${error.message}`,
+          color: "negative",
+          icon: "warning_amber",
+        });
+      }
     }
 
     return {
@@ -92,6 +130,7 @@ export default {
       emailText,
       nameText,
       passwordText,
+      isRegisterLoading,
       onSubmit,
     };
   },

@@ -4,6 +4,7 @@ import { createStore } from "vuex";
 // import example from './module-example'
 import generalModule from "./general-module";
 import authModule from "./auth-module";
+import usersModule from "./users-module";
 
 /*
  * If not building with SSR mode, you can
@@ -20,6 +21,7 @@ export default store(function (/* { ssrContext } */) {
       // example
       generalModule,
       authModule,
+      usersModule,
     },
 
     // enable strict mode (adds overhead!)

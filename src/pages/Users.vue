@@ -22,7 +22,7 @@
         <div class="column custom-column">
           <div class="q-py-md user-table">
             <q-table
-              title="Treats"
+              title="Users"
               :rows="rows"
               :columns="columns"
               row-key="id"
@@ -33,8 +33,9 @@
               <template v-slot:top>
                 <q-space />
                 <q-input
-                  borderless
+                  outlined
                   dense
+                  label="Buscar"
                   debounce="300"
                   color="primary"
                   v-model="filter"
@@ -74,164 +75,83 @@
 </template>
 
 <script>
-import { ref, computed } from "vue";
+import { ref, computed, onBeforeMount } from "vue";
 import { useQuasar } from "quasar";
+import { useStore } from "vuex";
 
 const columns = [
   {
+    name: "id",
+    required: true,
+    label: "ID",
+    align: "left",
+    field: (row) => row.id,
+    format: (val) => `${val}`,
+    sortable: true,
+  },
+  {
     name: "name",
     required: true,
-    label: "Dessert (100g serving)",
+    label: "Nombre",
     align: "left",
     field: (row) => row.name,
     format: (val) => `${val}`,
     sortable: true,
   },
   {
-    name: "calories",
-    align: "center",
-    label: "Calories",
-    field: "calories",
+    name: "email",
+    required: true,
+    label: "Correo Electrónico",
+    align: "left",
+    field: (row) => row.email,
     sortable: true,
   },
-  { name: "fat", label: "Fat (g)", field: "fat", sortable: true },
-  { name: "carbs", label: "Carbs (g)", field: "carbs" },
-  { name: "protein", label: "Protein (g)", field: "protein" },
-  { name: "sodium", label: "Sodium (mg)", field: "sodium" },
   {
-    name: "calcium",
-    label: "Calcium (%)",
-    field: "calcium",
+    name: "role",
+    required: true,
+    label: "Rol",
+    align: "left",
+    field: (row) => row.role,
     sortable: true,
-    sort: (a, b) => parseInt(a, 10) - parseInt(b, 10),
-  },
-  {
-    name: "iron",
-    label: "Iron (%)",
-    field: "iron",
-    sortable: true,
-    sort: (a, b) => parseInt(a, 10) - parseInt(b, 10),
-  },
-];
-
-const originalRows = [
-  {
-    name: "Frozen Yogurt",
-    calories: 159,
-    fat: 6.0,
-    carbs: 24,
-    protein: 4.0,
-    sodium: 87,
-    calcium: "14%",
-    iron: "1%",
-  },
-  {
-    name: "Ice cream sandwich",
-    calories: 237,
-    fat: 9.0,
-    carbs: 37,
-    protein: 4.3,
-    sodium: 129,
-    calcium: "8%",
-    iron: "1%",
-  },
-  {
-    name: "Eclair",
-    calories: 262,
-    fat: 16.0,
-    carbs: 23,
-    protein: 6.0,
-    sodium: 337,
-    calcium: "6%",
-    iron: "7%",
-  },
-  {
-    name: "Cupcake",
-    calories: 305,
-    fat: 3.7,
-    carbs: 67,
-    protein: 4.3,
-    sodium: 413,
-    calcium: "3%",
-    iron: "8%",
-  },
-  {
-    name: "Gingerbread",
-    calories: 356,
-    fat: 16.0,
-    carbs: 49,
-    protein: 3.9,
-    sodium: 327,
-    calcium: "7%",
-    iron: "16%",
-  },
-  {
-    name: "Jelly bean",
-    calories: 375,
-    fat: 0.0,
-    carbs: 94,
-    protein: 0.0,
-    sodium: 50,
-    calcium: "0%",
-    iron: "0%",
-  },
-  {
-    name: "Lollipop",
-    calories: 392,
-    fat: 0.2,
-    carbs: 98,
-    protein: 0,
-    sodium: 38,
-    calcium: "0%",
-    iron: "2%",
-  },
-  {
-    name: "Honeycomb",
-    calories: 408,
-    fat: 3.2,
-    carbs: 87,
-    protein: 6.5,
-    sodium: 562,
-    calcium: "0%",
-    iron: "45%",
-  },
-  {
-    name: "Donut",
-    calories: 452,
-    fat: 25.0,
-    carbs: 51,
-    protein: 4.9,
-    sodium: 326,
-    calcium: "2%",
-    iron: "22%",
-  },
-  {
-    name: "KitKat",
-    calories: 518,
-    fat: 26.0,
-    carbs: 65,
-    protein: 7,
-    sodium: 54,
-    calcium: "12%",
-    iron: "6%",
   },
 ];
 
 export default {
   setup() {
     const $q = useQuasar();
-    // test variables for table
+    const $store = useStore();
+
     const loading = ref(false);
     const filter = ref("");
     const rowCount = ref(10);
-    const rows = ref([...originalRows]);
-    // end test variables for table
-
-    let isDialogOpen = ref(false);
-    let addressTest = ref("");
-
+    const rows = ref([]);
     const isDarkModeActive = computed(() => $q.dark.isActive);
+    const isDialogOpen = ref(false);
+    const addressTest = ref("");
 
+    getUserData();
+
+    async function getUserData() {
+      loading.value = true;
+      try {
+        await $store.dispatch("usersModule/requestUsersData");
+        $q.notify({
+          name: "Éxito",
+          caption: "Los datos se han cargado correctamente",
+          color: "positive",
+          icon: "check_circle",
+        });
+        loading.value = false;
+        rows.value = $store.state.usersModule.users;
+      } catch (error) {
+        $q.notify({
+          name: "Error",
+          caption: `Ha ocurrido un error al cargar los datos ${error.response}`,
+          color: "negative",
+          icon: "warning_amber",
+        });
+      }
+    }
     // function of quasar framework, you can find this in the documentation.
     function myTweak(offset) {
       return { minHeight: offset ? `calc(100vh - ${offset}px` : "100vh" };
@@ -255,41 +175,6 @@ export default {
       loading,
       filter,
       rowCount,
-
-      // emulate fetching data from server
-      addRow() {
-        loading.value = true;
-        setTimeout(() => {
-          const index = Math.floor(Math.random() * (rows.value.length + 1)),
-            row = originalRows[Math.floor(Math.random() * originalRows.length)];
-
-          if (rows.value.length === 0) {
-            rowCount.value = 0;
-          }
-
-          row.id = ++rowCount.value;
-          const newRow = { ...row }; // extend({}, row, { name: `${row.name} (${row.__count})` })
-          rows.value = [
-            ...rows.value.slice(0, index),
-            newRow,
-            ...rows.value.slice(index),
-          ];
-          loading.value = false;
-        }, 500);
-      },
-
-      removeRow() {
-        loading.value = true;
-        setTimeout(() => {
-          const index = Math.floor(Math.random() * rows.value.length);
-          rows.value = [
-            ...rows.value.slice(0, index),
-            ...rows.value.slice(index + 1),
-          ];
-          loading.value = false;
-        }, 500);
-      },
-      // end returning variables for table
     };
   },
 };

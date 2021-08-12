@@ -83,6 +83,7 @@ module.exports = configure(function (ctx) {
     framework: {
       config: {
         dark: 'auto', // depends of the browser configuration
+        notify: { } // no config yet, we configure this later. See documentation.
       },
 
       // iconSet: 'material-icons', // Quasar icon set
@@ -98,7 +99,8 @@ module.exports = configure(function (ctx) {
       // Quasar plugins
       plugins: [
         'LocalStorage',
-        'SessionStorage'
+        'SessionStorage',
+        'Notify'
       ]
     },
 
