@@ -1,3 +1,4 @@
+import { LocalStorage } from "quasar";
 /**
  * Execute a function infinite times in a loop
  * @param {number} timeLoop // The number in milliseconds to execute the action
@@ -10,6 +11,10 @@ function notifyMessage(timeLoop, callOperation) {
   }, timeLoop);
 }
 
+function getTokenFromStorage() {
+  return `Bearer ${LocalStorage.getItem("token")}`
+}
+
 const connection = "http://192.168.0.19:8080";
 
-export { notifyMessage, connection };
+export { notifyMessage, getTokenFromStorage, connection };

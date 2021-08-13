@@ -22,7 +22,7 @@
         <div class="column custom-column">
           <div class="q-py-md user-table">
             <q-table
-              title="Treats"
+              title="Clients"
               :rows="rows"
               :columns="columns"
               row-key="id"
@@ -153,160 +153,40 @@ const columns = [
   {
     name: "name",
     required: true,
-    label: "Dessert (100g serving)",
+    label: "Nombre",
     align: "left",
     field: (row) => row.name,
     format: (val) => `${val}`,
     sortable: true,
   },
   {
-    name: "calories",
-    align: "center",
-    label: "Calories",
-    field: "calories",
+    name: "nit",
+    required: true,
+    label: "NIT",
+    align: "left",
+    field: (row) => row.nit,
+    format: (val) => `${val}`,
     sortable: true,
   },
-  { name: "fat", label: "Fat (g)", field: "fat", sortable: true },
-  { name: "carbs", label: "Carbs (g)", field: "carbs" },
-  { name: "protein", label: "Protein (g)", field: "protein" },
-  { name: "sodium", label: "Sodium (mg)", field: "sodium" },
   {
-    name: "calcium",
-    label: "Calcium (%)",
-    field: "calcium",
+    name: "address",
+    required: true,
+    label: "Dirección",
+    align: "left",
+    field: (row) => row.address,
     sortable: true,
-    sort: (a, b) => parseInt(a, 10) - parseInt(b, 10),
-  },
-  {
-    name: "iron",
-    label: "Iron (%)",
-    field: "iron",
-    sortable: true,
-    sort: (a, b) => parseInt(a, 10) - parseInt(b, 10),
   },
 ];
 
-const originalRows = [
-  {
-    id: 1,
-    name: "Frozen Yogurt",
-    calories: 159,
-    fat: 6.0,
-    carbs: 24,
-    protein: 4.0,
-    sodium: 87,
-    calcium: "14%",
-    iron: "1%",
-  },
-  {
-    id: 2,
-    name: "Ice cream sandwich",
-    calories: 237,
-    fat: 9.0,
-    carbs: 37,
-    protein: 4.3,
-    sodium: 129,
-    calcium: "8%",
-    iron: "1%",
-  },
-  {
-    id: 3,
-    name: "Eclair",
-    calories: 262,
-    fat: 16.0,
-    carbs: 23,
-    protein: 6.0,
-    sodium: 337,
-    calcium: "6%",
-    iron: "7%",
-  },
-  {
-    id: 4,
-    name: "Cupcake",
-    calories: 305,
-    fat: 3.7,
-    carbs: 67,
-    protein: 4.3,
-    sodium: 413,
-    calcium: "3%",
-    iron: "8%",
-  },
-  {
-    id: 5,
-    name: "Gingerbread",
-    calories: 356,
-    fat: 16.0,
-    carbs: 49,
-    protein: 3.9,
-    sodium: 327,
-    calcium: "7%",
-    iron: "16%",
-  },
-  {
-    id: 6,
-    name: "Jelly bean",
-    calories: 375,
-    fat: 0.0,
-    carbs: 94,
-    protein: 0.0,
-    sodium: 50,
-    calcium: "0%",
-    iron: "0%",
-  },
-  {
-    id: 7,
-    name: "Lollipop",
-    calories: 392,
-    fat: 0.2,
-    carbs: 98,
-    protein: 0,
-    sodium: 38,
-    calcium: "0%",
-    iron: "2%",
-  },
-  {
-    id: 8,
-    name: "Honeycomb",
-    calories: 408,
-    fat: 3.2,
-    carbs: 87,
-    protein: 6.5,
-    sodium: 562,
-    calcium: "0%",
-    iron: "45%",
-  },
-  {
-    id: 23,
-    name: "Donut",
-    calories: 452,
-    fat: 25.0,
-    carbs: 51,
-    protein: 4.9,
-    sodium: 326,
-    calcium: "2%",
-    iron: "22%",
-  },
-  {
-    id: 24,
-    name: "KitKat",
-    calories: 518,
-    fat: 26.0,
-    carbs: 65,
-    protein: 7,
-    sodium: 54,
-    calcium: "12%",
-    iron: "6%",
-  },
-];
 export default {
   setup() {
-    const store = useStore();
+    const $store = useStore();
     const $q = useQuasar();
     // test variables for table
     const loading = ref(false);
     const filter = ref("");
     const rowCount = ref(10);
-    const rows = ref([...originalRows]);
+    const rows = ref([]);
     // end test variables for table
 
     const dataDeleteInfo = ref({});
@@ -317,14 +197,28 @@ export default {
     let isDialogOpen = ref(false);
     let addressTest = ref("");
 
-    function onClick() {
-      console.log("this is clicked!");
-      isDialogOpen.value = !isDialogOpen.value;
-    }
+    setupClients();
 
-    // function of quasar framework, you can find this in the documentation.
-    function myTweak(offset) {
-      return { minHeight: offset ? `calc(100vh - ${offset}px` : "100vh" };
+    async function setupClients() {
+      loading.value = true;
+      try {
+        await $store.dispatch("clientsModule/requestAllClients");
+        $q.notify({
+          name: "Éxito",
+          caption: "Los datos se cargaron correctamente",
+          color: "positive",
+          icon: "check_circle",
+        });
+        loading.value = false;
+        rows.value = $store.state.clientsModule.clients;
+      } catch (error) {
+        $q.notify({
+          name: "Error",
+          caption: `Hubo un error al cargar los datos`,
+          color: "negative",
+          icon: "warning_amber",
+        });
+      }
     }
 
     function displayDeleteDialog(clientIndex) {
@@ -334,6 +228,16 @@ export default {
 
       dataDeleteInfo.value.clientName = clientName;
       dataDeleteInfo.value.clientIndex = clientIndex;
+    }
+
+    function onClick() {
+      console.log("this is clicked!");
+      isDialogOpen.value = !isDialogOpen.value;
+    }
+
+    // function of quasar framework, you can find this in the documentation.
+    function myTweak(offset) {
+      return { minHeight: offset ? `calc(100vh - ${offset}px` : "100vh" };
     }
 
     return {
@@ -352,41 +256,6 @@ export default {
       loading,
       filter,
       rowCount,
-
-      // emulate fetching data from server
-      addRow() {
-        loading.value = true;
-        setTimeout(() => {
-          const index = Math.floor(Math.random() * (rows.value.length + 1)),
-            row = originalRows[Math.floor(Math.random() * originalRows.length)];
-
-          if (rows.value.length === 0) {
-            rowCount.value = 0;
-          }
-
-          row.id = ++rowCount.value;
-          const newRow = { ...row }; // extend({}, row, { name: `${row.name} (${row.__count})` })
-          rows.value = [
-            ...rows.value.slice(0, index),
-            newRow,
-            ...rows.value.slice(index),
-          ];
-          loading.value = false;
-        }, 500);
-      },
-
-      removeRow() {
-        loading.value = true;
-        setTimeout(() => {
-          const index = Math.floor(Math.random() * rows.value.length);
-          rows.value = [
-            ...rows.value.slice(0, index),
-            ...rows.value.slice(index + 1),
-          ];
-          loading.value = false;
-        }, 500);
-      },
-      // end returning variables for table
     };
   },
 };
