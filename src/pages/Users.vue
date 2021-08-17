@@ -6,19 +6,12 @@
           <h4>USUARIOS</h4>
         </div>
       </div>
-      <div class="row">
-        <div class="column">
-          <q-btn
-            :outline="isDarkModeActive"
-            color="primary"
-            icon="person_add"
-            class="create-button"
-            label="Crear Nuevo"
-            @click="onClick"
-          />
+      <div v-if="loading" class="row">
+        <div class="column custom-column">
+          <table-data-skeleton />
         </div>
       </div>
-      <div class="row">
+      <div v-else class="row">
         <div class="column custom-column">
           <div class="q-py-md user-table">
             <q-table
@@ -44,6 +37,42 @@
                     <q-icon name="search" />
                   </template>
                 </q-input>
+              </template>
+              <template v-slot:body="props">
+                <q-tr :props="props">
+                  <q-td
+                    v-for="col in props.cols"
+                    :key="col.name"
+                    :props="props"
+                  >
+                    {{ col.value }}
+                  </q-td>
+                  <q-td auto-width>
+                    <q-btn
+                      :outline="isDarkModeActive"
+                      size="sm"
+                      class="q-mx-xs"
+                      color="primary"
+                      icon="edit"
+                      round
+                    />
+                    <q-btn
+                      :outline="isDarkModeActive"
+                      size="sm"
+                      class="q-mx-xs"
+                      color="accent"
+                      icon="delete"
+                      round
+                    />
+                  </q-td>
+                </q-tr>
+                <q-tr v-show="props.expand" :props="props">
+                  <q-td colspan="100%">
+                    <div class="text-left">
+                      This is expand slot for row above: {{ props.row.name }}.
+                    </div>
+                  </q-td>
+                </q-tr>
               </template>
             </q-table>
           </div>
@@ -78,6 +107,8 @@
 import { ref, computed, onBeforeMount } from "vue";
 import { useQuasar } from "quasar";
 import { useStore } from "vuex";
+
+import TableDataSkeleton from "../components/Skeletons/TableData.vue";
 
 const columns = [
   {
@@ -117,6 +148,7 @@ const columns = [
 ];
 
 export default {
+  components: { TableDataSkeleton },
   setup() {
     const $q = useQuasar();
     const $store = useStore();

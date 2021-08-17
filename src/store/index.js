@@ -6,6 +6,7 @@ import generalModule from "./general-module";
 import authModule from "./auth-module";
 import usersModule from "./users-module";
 import clientsModule from "./clients-module";
+import contactsModule from "./contacts-module";
 
 /*
  * If not building with SSR mode, you can
@@ -24,6 +25,7 @@ export default store(function (/* { ssrContext } */) {
       authModule,
       usersModule,
       clientsModule,
+      contactsModule,
     },
 
     // enable strict mode (adds overhead!)

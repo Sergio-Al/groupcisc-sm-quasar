@@ -1,5 +1,5 @@
 <template>
-  <q-page class="q-pa-lg" style="width: 100%">
+  <q-page class="q-pa-lg">
     <div class="container">
       <div class="row">
         <div class="column">
@@ -10,6 +10,7 @@
         <div class="column">
           <q-btn
             :outline="isDarkModeActive"
+            :disable="loading"
             color="primary"
             class="create-button"
             icon="person_add"
@@ -18,7 +19,12 @@
           />
         </div>
       </div>
-      <div class="row">
+      <div v-if="loading" class="row">
+        <div class="column custom-column">
+          <table-data-skeleton/>
+        </div>
+      </div>
+      <div v-else class="row">
         <div class="column custom-column">
           <div class="q-py-md user-table">
             <q-table
@@ -140,6 +146,8 @@ import { ref, computed } from "vue";
 import { useStore } from "vuex";
 import { useQuasar } from "quasar";
 
+import TableDataSkeleton from "../components/Skeletons/TableData.vue";
+
 const columns = [
   {
     name: "id",
@@ -179,6 +187,7 @@ const columns = [
 ];
 
 export default {
+  components: { TableDataSkeleton },
   setup() {
     const $store = useStore();
     const $q = useQuasar();
