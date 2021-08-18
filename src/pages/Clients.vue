@@ -15,13 +15,13 @@
             class="create-button"
             icon="person_add"
             label="Crear Nuevo"
-            @click="onClick"
+            @click="openEditDialog()"
           />
         </div>
       </div>
       <div v-if="loading" class="row">
         <div class="column custom-column">
-          <table-data-skeleton/>
+          <table-data-skeleton />
         </div>
       </div>
       <div v-else class="row">
@@ -74,6 +74,15 @@
                       :outline="isDarkModeActive"
                       size="sm"
                       class="q-mx-xs"
+                      color="info"
+                      icon="edit"
+                      round
+                      @click="openEditDialog(props.row)"
+                    />
+                    <q-btn
+                      :outline="isDarkModeActive"
+                      size="sm"
+                      class="q-mx-xs"
                       color="accent"
                       icon="delete"
                       round
@@ -95,46 +104,113 @@
       </div>
     </div>
     <q-dialog v-model="isDialogOpen" persistent>
-      <q-card style="min-width: 350px">
+      <q-card class="creation-card-simple q-pa-sm">
         <q-card-section>
-          <div class="text-h6">Creating a new user...</div>
+          <div class="text-h6">{{ titleDialog }}</div>
+        </q-card-section>
+        <q-card-section class="text-center">
+          <div class="text-h6">Ingrese los datos</div>
         </q-card-section>
 
         <q-card-section class="q-pt-none">
-          <q-input
-            dense
-            v-model="addressTest"
-            autofocus
-            @keyup.enter="isDialogOpen = false"
-          />
-        </q-card-section>
+          <div>
+            <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-md">
+              <q-input
+                class="q-mb-xs"
+                :disable="isLoadingForm"
+                v-model.trim="nameField"
+                type="text"
+                outlined
+                label="Nombre"
+                :rules="[
+                  (val) => (val && val.length > 0) || 'Ingresa un nombre',
+                ]"
+              />
+              <q-input
+                class="q-mb-xs"
+                :disable="isLoadingForm"
+                v-model.trim="nitField"
+                type="number"
+                outlined
+                label="NIT"
+                :rules="[
+                  (val) =>
+                    (val && val.toString().length > 0) || 'Ingresa un NIT',
+                ]"
+              />
+              <q-input
+                class="q-mb-xs"
+                :disable="isLoadingForm"
+                v-model.trim="addressField"
+                type="text"
+                outlined
+                label="Dirección"
+                :rules="[
+                  (val) => (val && val.length > 0) || 'Ingresa una Dirección',
+                ]"
+              />
 
-        <q-card-actions align="right" class="text-primary">
-          <q-btn flat label="Cancel" v-close-popup />
-          <q-btn flat label="Crear Nuevo" v-close-popup />
-        </q-card-actions>
+              <div class="flex justify-between">
+                <div>
+                  <q-btn
+                    label="Ingresar"
+                    :disable="isLoadingForm"
+                    type="submit"
+                    color="primary"
+                  />
+                  <q-btn
+                    label="Limpiar"
+                    :disable="isLoadingForm"
+                    type="reset"
+                    color="primary"
+                    flat
+                    class="q-ml-sm"
+                  />
+                </div>
+
+                <q-btn
+                  :disable="isLoadingForm"
+                  outline
+                  color="primary"
+                  label="Cancelar"
+                  @click="cancelFormValue"
+                />
+              </div>
+            </q-form>
+          </div>
+        </q-card-section>
       </q-card>
     </q-dialog>
     <q-dialog v-model="isConfirmingDelete" persistent>
       <q-card>
         <q-card-section class="bg-accent text-white">
-          <div class="text-h6">
-            Eliminar id: {{ dataDeleteInfo.clientIndex }}
-          </div>
+          <div class="text-h6">Eliminar id: {{ fetchedDataInfo.id }}</div>
         </q-card-section>
         <q-card-section class="row items-center">
           <q-avatar icon="warning" color="accent" text-color="white" />
           <span class="q-ml-sm">
             ¿Seguro que quieres eliminar a
             <span class="text-weight-bold">
-              {{ dataDeleteInfo.clientName }}
+              {{ fetchedDataInfo.name }}
             </span>
             ?
           </span>
         </q-card-section>
         <q-card-actions align="right">
-          <q-btn flat label="Cancelar" color="primary" v-close-popup />
-          <q-btn flat label="Eliminar" color="accent" v-close-popup />
+          <q-btn
+            flat
+            :disabled="isLoadingForm"
+            label="Cancelar"
+            color="primary"
+            v-close-popup
+          />
+          <q-btn
+            flat
+            :disabled="isLoadingForm"
+            label="Eliminar"
+            color="accent"
+            @click="deleteClient(fetchedDataInfo.id)"
+          />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -193,12 +269,19 @@ export default {
     const $q = useQuasar();
     // test variables for table
     const loading = ref(false);
+    const isLoadingForm = ref(false);
     const filter = ref("");
     const rowCount = ref(10);
     const rows = ref([]);
     // end test variables for table
 
-    const dataDeleteInfo = ref({});
+    const titleDialog = ref("");
+    const nameField = ref("");
+    const nitField = ref(null);
+    const addressField = ref("");
+    const statusDialog = ref("");
+
+    const fetchedDataInfo = ref({});
     const isConfirmingDelete = ref(false);
     const isDarkModeActive = computed(() => $q.dark.isActive);
     // console.log(store.state.generalModule.isDarkModeActive); //example of vuex store
@@ -232,16 +315,123 @@ export default {
 
     function displayDeleteDialog(clientIndex) {
       isConfirmingDelete.value = !isConfirmingDelete.value;
-      const clientRow = rows.value.filter((row) => row.id == clientIndex);
-      const clientName = clientRow[0].name;
-
-      dataDeleteInfo.value.clientName = clientName;
-      dataDeleteInfo.value.clientIndex = clientIndex;
+      captureDataFromIndex(clientIndex);
     }
 
-    function onClick() {
-      console.log("this is clicked!");
+    function captureDataFromIndex(index) {
+      const clientData = rows.value.filter((row) => row.id == index)[0];
+      fetchedDataInfo.value = { ...clientData };
+    }
+
+    async function deleteClient(idClient) {
+      isLoadingForm.value = true;
+      try {
+        await $store.dispatch("clientsModule/deleteClient", { id: idClient });
+        $q.notify({
+          name: "Exito",
+          caption: "Se ha eliminado correctemente",
+          color: "positive",
+          icon: "check_circle",
+        });
+        isLoadingForm.value = false;
+        setupClients();
+        isConfirmingDelete.value = !isConfirmingDelete.value;
+      } catch (error) {
+        $q.notify({
+          name: "Error",
+          caption: "Ha ocurrido un error al eliminar el elemento",
+          color: "negative",
+          icon: "warning_amber",
+        });
+        isLoadingForm.value = false;
+      }
+    }
+
+    function openEditDialog(data) {
       isDialogOpen.value = !isDialogOpen.value;
+      if (data) {
+        titleDialog.value = `Modificar usuario ${data.id}`;
+        nameField.value = data.name;
+        nitField.value = Number(data.nit);
+        addressField.value = data.address;
+        statusDialog.value = "modify";
+        captureDataFromIndex(data.id);
+        return;
+      }
+
+      titleDialog.value = "Crear Nuevo Usuario";
+      statusDialog.value = "create";
+    }
+
+    async function onSubmit() {
+      isLoadingForm.value = true;
+      if (statusDialog.value === "create") {
+        try {
+          await $store.dispatch("clientsModule/createClient", {
+            name: nameField.value,
+            nit: Number(nitField.value),
+            address: addressField.value,
+          });
+          $q.notify({
+            name: "Exito",
+            caption: "Se ha creado el dato correctamente",
+            color: "positive",
+            icon: "check_circle",
+          });
+          isLoadingForm.value = false;
+          isDialogOpen.value = false;
+          onReset();
+          setupClients();
+        } catch (error) {
+          $q.notify({
+            name: "Error",
+            caption: "Hubo un error al crear los datos",
+            color: "negative",
+            icon: "warning_amber",
+          });
+          isLoadingForm.value = false;
+          onReset();
+        }
+      } else if (statusDialog.value === "modify") {
+        try {
+          await $store.dispatch("clientsModule/modifyClient", {
+            id: fetchedDataInfo.value.id,
+            name: nameField.value,
+            nit: Number(nitField.value),
+            address: addressField.value,
+          });
+          $q.notify({
+            name: "Exito",
+            caption: "Se actualizaron los datos correctamente",
+            color: "positive",
+            icon: "check_circle",
+          });
+          isLoadingForm.value = false;
+          isDialogOpen.value = false;
+          setupClients();
+        } catch (error) {
+          $q.notify({
+            name: "Error",
+            caption: "Hubo un error al modificar los datos",
+            color: "negative",
+            icon: "warning_amber",
+          });
+          isLoadingForm.value = false;
+        }
+      } else {
+        return;
+      }
+    }
+
+    function onReset() {
+      nameField.value = "";
+      nitField.value = "";
+      addressField.value = "";
+    }
+
+    function cancelFormValue() {
+      onReset();
+      isDialogOpen.value = false;
     }
 
     // function of quasar framework, you can find this in the documentation.
@@ -251,17 +441,26 @@ export default {
 
     return {
       myTweak,
-      onClick,
+      openEditDialog,
       displayDeleteDialog,
+      onSubmit,
+      onReset,
+      deleteClient,
+      cancelFormValue,
+
+      isLoadingForm,
       isConfirmingDelete,
-      dataDeleteInfo,
+      fetchedDataInfo,
       isDarkModeActive,
       isDialogOpen,
       addressTest,
-      // returning variables for table
+      titleDialog,
+      nameField,
+      nitField,
+      addressField,
+
       columns,
       rows,
-
       loading,
       filter,
       rowCount,
