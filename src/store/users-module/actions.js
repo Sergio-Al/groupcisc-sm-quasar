@@ -17,4 +17,28 @@ export default {
 
     commit("populateUsersData", response.data);
   },
+  async updateUserData({ commit }, payload) {
+    const response = await api.patch(`/users/${payload.id}`, payload, {
+      headers: {
+        Authorization: getTokenFromStorage(),
+      },
+    });
+
+    if (response.status !== 200) {
+      throw new Error(
+        response.message || "hubo un error al modificar los datos"
+      );
+    }
+  },
+  async deleteUserData({ commit }, payload) {
+    const response = await api.delete(`/users/${payload.id}`, {
+      headers: {
+        Authorization: getTokenFromStorage(),
+      },
+    });
+
+    if (response.status !== 200) {
+      throw new Error(response.message || "Hubo un error al eliminar el dato");
+    }
+  },
 };

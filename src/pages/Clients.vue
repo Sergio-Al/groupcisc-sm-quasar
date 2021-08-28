@@ -151,30 +151,30 @@
               />
 
               <div class="flex justify-between">
+                <q-btn
+                  label="Limpiar"
+                  :disable="isLoadingForm"
+                  type="reset"
+                  color="primary"
+                  flat
+                  class="q-ml-sm"
+                />
                 <div>
                   <q-btn
-                    label="Ingresar"
+                    class="q-mr-md"
+                    :disable="isLoadingForm"
+                    outline
+                    color="primary"
+                    label="Cancelar"
+                    @click="cancelFormValue"
+                  />
+                  <q-btn
+                    label="Guardar"
                     :disable="isLoadingForm"
                     type="submit"
                     color="primary"
                   />
-                  <q-btn
-                    label="Limpiar"
-                    :disable="isLoadingForm"
-                    type="reset"
-                    color="primary"
-                    flat
-                    class="q-ml-sm"
-                  />
                 </div>
-
-                <q-btn
-                  :disable="isLoadingForm"
-                  outline
-                  color="primary"
-                  label="Cancelar"
-                  @click="cancelFormValue"
-                />
               </div>
             </q-form>
           </div>
@@ -221,46 +221,12 @@
 import { ref, computed } from "vue";
 import { useStore } from "vuex";
 import { useQuasar } from "quasar";
+import { positiveMessage, negativeMessage } from "../composable/light-notify";
+import { columnsForClients } from "../composable/column-tables";
 
 import TableDataSkeleton from "../components/Skeletons/TableData.vue";
 
-const columns = [
-  {
-    name: "id",
-    required: true,
-    label: "ID",
-    align: "left",
-    field: (row) => row.id,
-    format: (val) => `${val}`, // format of sort
-    sortable: true,
-  },
-  {
-    name: "name",
-    required: true,
-    label: "Nombre",
-    align: "left",
-    field: (row) => row.name,
-    format: (val) => `${val}`,
-    sortable: true,
-  },
-  {
-    name: "nit",
-    required: true,
-    label: "NIT",
-    align: "left",
-    field: (row) => row.nit,
-    format: (val) => `${val}`,
-    sortable: true,
-  },
-  {
-    name: "address",
-    required: true,
-    label: "Dirección",
-    align: "left",
-    field: (row) => row.address,
-    sortable: true,
-  },
-];
+const columns = columnsForClients;
 
 export default {
   components: { TableDataSkeleton },
@@ -295,21 +261,11 @@ export default {
       loading.value = true;
       try {
         await $store.dispatch("clientsModule/requestAllClients");
-        $q.notify({
-          name: "Éxito",
-          caption: "Los datos se cargaron correctamente",
-          color: "positive",
-          icon: "check_circle",
-        });
+        positiveMessage("Éxito", "Los datos se cargaron correctamente");
         loading.value = false;
         rows.value = $store.state.clientsModule.clients;
       } catch (error) {
-        $q.notify({
-          name: "Error",
-          caption: `Hubo un error al cargar los datos`,
-          color: "negative",
-          icon: "warning_amber",
-        });
+        negativeMessage("Error", "Hubo un error al cargar los datos");
       }
     }
 
@@ -327,22 +283,12 @@ export default {
       isLoadingForm.value = true;
       try {
         await $store.dispatch("clientsModule/deleteClient", { id: idClient });
-        $q.notify({
-          name: "Exito",
-          caption: "Se ha eliminado correctemente",
-          color: "positive",
-          icon: "check_circle",
-        });
+        positiveMessage("Éxito", "Se ha eliminado correctamente");
         isLoadingForm.value = false;
         setupClients();
         isConfirmingDelete.value = !isConfirmingDelete.value;
       } catch (error) {
-        $q.notify({
-          name: "Error",
-          caption: "Ha ocurrido un error al eliminar el elemento",
-          color: "negative",
-          icon: "warning_amber",
-        });
+        negativeMessage("Error", "Ha ocurrido un error al eliminar el archivo");
         isLoadingForm.value = false;
       }
     }
@@ -372,23 +318,13 @@ export default {
             nit: Number(nitField.value),
             address: addressField.value,
           });
-          $q.notify({
-            name: "Exito",
-            caption: "Se ha creado el dato correctamente",
-            color: "positive",
-            icon: "check_circle",
-          });
+          positiveMessage("Éxito", "Se ha creado el dato correctamente");
           isLoadingForm.value = false;
           isDialogOpen.value = false;
           onReset();
           setupClients();
         } catch (error) {
-          $q.notify({
-            name: "Error",
-            caption: "Hubo un error al crear los datos",
-            color: "negative",
-            icon: "warning_amber",
-          });
+          negativeMessage("Error", "Hubo un error al crear los datos");
           isLoadingForm.value = false;
           onReset();
         }
@@ -400,22 +336,12 @@ export default {
             nit: Number(nitField.value),
             address: addressField.value,
           });
-          $q.notify({
-            name: "Exito",
-            caption: "Se actualizaron los datos correctamente",
-            color: "positive",
-            icon: "check_circle",
-          });
+          positiveMessage("Éxito", "Se actualizaron los datos correctamente");
           isLoadingForm.value = false;
           isDialogOpen.value = false;
           setupClients();
         } catch (error) {
-          $q.notify({
-            name: "Error",
-            caption: "Hubo un error al modificar los datos",
-            color: "negative",
-            icon: "warning_amber",
-          });
+          negativeMessage("Error", "Hubo un error al modificar los datos");
           isLoadingForm.value = false;
         }
       } else {

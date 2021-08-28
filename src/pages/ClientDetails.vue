@@ -199,6 +199,7 @@
 import { ref, computed } from "vue";
 import { useStore } from "vuex";
 import { useQuasar } from "quasar";
+import { positiveMessage, negativeMessage } from "../composable/light-notify";
 
 import ClientDataSkeleton from "../components/Skeletons/ClientData.vue";
 import ContactsClientData from "../components/Skeletons/ContactsClientData.vue";
@@ -293,12 +294,7 @@ export default {
           id: currentId.value,
         });
 
-        $q.notify({
-          name: "Correcto",
-          caption: "Datos del cliente cargados correctamente",
-          color: "positive",
-          icon: "check_circle",
-        });
+        positiveMessage("Éxito", "Datos del cliente cargados correctamente");
 
         isLoadingClientData.value = false;
 
@@ -309,12 +305,11 @@ export default {
         contactPerClientRow.value =
           $store.state.contactsModule.contactsPerClient;
       } catch (error) {
-        $q.notify({
-          name: "Error",
-          caption: `Hubo un error al cargar los datos del cliente`,
-          color: "negative",
-          icon: "warning_amber",
-        });
+        console.log(error);
+        negativeMessage(
+          "Error",
+          "hubo un error al cargar los datos del cliente"
+        );
       }
     }
 
