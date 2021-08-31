@@ -58,7 +58,7 @@
             icon="person_add"
             class="create-button"
             label="Crear Nuevo"
-            @click="onClick"
+            @click="onOpenEditDialog"
           />
         </div>
       </div>
@@ -119,6 +119,29 @@
                 <q-td v-for="col in props.cols" :key="col.name" :props="props">
                   {{ col.value }}
                 </q-td>
+                <q-td auto-width>
+                  <q-btn
+                    :outline="isDarkModeActive"
+                    size="sm"
+                    class="q-mx-xs"
+                    color="info"
+                    icon="edit"
+                    round
+                    @click="onOpenEditDialog(props.row)"
+                  >
+                    <q-tooltip> Editar </q-tooltip>
+                  </q-btn>
+                  <q-btn
+                    :outline="isDarkModeActive"
+                    size="sm"
+                    class="q-mx-xs"
+                    color="accent"
+                    icon="delete"
+                    round
+                  >
+                    <q-tooltip> Eliminar </q-tooltip>
+                  </q-btn>
+                </q-td>
               </q-tr>
               <q-tr v-show="props.expand" :props="props">
                 <q-td colspan="100%">
@@ -172,24 +195,146 @@
       </div>
     </div>
     <q-dialog v-model="isModifyDialogOpen" persistent>
-      <q-card style="min-width: 350px">
+      <q-card class="creation-card-big q-pa-sm">
         <q-card-section>
-          <div class="text-h6">Creating a new contact</div>
+          <div class="text-h6">TitleDialog</div>
         </q-card-section>
-
+        <q-card-section class="text-center q-pa-none">
+          <div class="text-h6">Ingrese los datos</div>
+        </q-card-section>
         <q-card-section class="q-pt-none">
-          <q-input
-            dense
-            v-model="addressTest"
-            autofocus
-            @keyup.enter="isModifyDialogOpen = false"
-          />
-        </q-card-section>
+          <div>
+            <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-md">
+              <div class="row">
+                <div class="col-xs-12 col-sm-6 q-pr-xs">
+                  <q-input
+                    v-model.trim="nameContact"
+                    type="text"
+                    label="Nombre"
+                    :disable="isLoadingClientData"
+                    class="q-mb-xs"
+                    :rules="[validateText]"
+                  />
+                </div>
+                <div class="col-xs-12 col-sm-6">
+                  <q-input
+                    v-model.trim="lastNameContact"
+                    type="text"
+                    label="Apellidos"
+                    :disable="isLoadingClientData"
+                    class="q-mb-xs"
+                    :rules="[validateText]"
+                  />
+                </div>
+              </div>
 
-        <q-card-actions align="right" class="text-primary">
-          <q-btn flat label="Cancel" v-close-popup />
-          <q-btn flat label="Crear Nuevo" v-close-popup />
-        </q-card-actions>
+              <q-input
+                v-model.trim="emailContact"
+                type="email"
+                label="Correo Electrónico"
+                :disable="isLoadingClientData"
+                class="q-mb-xs"
+                :rules="[validateEmail]"
+              />
+              <q-input
+                v-model.trim="companyContact"
+                type="text"
+                label="Compañia"
+                :disable="isLoadingClientData"
+                class="q-mb-xs"
+                :rules="[validateText]"
+              />
+              <q-input
+                v-model.trim="addressOneContact"
+                type="text"
+                label="Dirección"
+                :disable="isLoadingClientData"
+                class="q-mb-xs"
+                :rules="[validateText]"
+              />
+              <q-input
+                v-model.trim="addressTwoContact"
+                type="text"
+                label="Dirección 2"
+                :disable="isLoadingClientData"
+                class="q-mb-xs"
+              />
+              <div class="row">
+                <div class="col-xs-12 col-sm-6 q-pr-xs">
+                  <q-input
+                    v-model.trim="telephoneContact"
+                    label="Teléfono"
+                    class="q-mb-xs"
+                    mask="(###)-##-###"
+                    hint="Formato: (###)-##-###"
+                    unmasked-value
+                    :rules="[validateNumber]"
+                  />
+                  <q-input
+                    v-model.trim="cityContact"
+                    type="text"
+                    label="Ciudad"
+                    :disable="isLoadingClientData"
+                    class="q-mb-xs"
+                    :rules="[validateText]"
+                  />
+                  <q-input
+                    v-model="countryContact"
+                    type="text"
+                    label="Pais"
+                    :disable="isLoadingClientData"
+                    class="q-mb-xs"
+                    :rules="[validateText]"
+                  />
+                </div>
+                <div class="col-xs-12 col-sm-6">
+                  <q-input
+                    v-model="positionContact"
+                    type="text"
+                    label="Posición"
+                    :disable="isLoadingClientData"
+                    class="q-mb-xs"
+                    :rules="[validateText]"
+                  />
+                  <q-input
+                    v-model="domainContact"
+                    type="text"
+                    label="Dominio-Web"
+                    :disable="isLoadingClientData"
+                    class="q-mb-xs"
+                    :rules="[validateText]"
+                  />
+                </div>
+              </div>
+              <div class="flex justify-between">
+                <q-btn
+                  color="primary"
+                  label="Limpiar"
+                  :disable="isLoadingClientData"
+                  type="reset"
+                  flat
+                  class="q-ml-sm"
+                />
+                <div>
+                  <q-btn
+                    color="primary"
+                    label="Cancelar"
+                    :disable="isLoadingClientData"
+                    outline
+                    class="q-mr-md"
+                    @click="onCancel"
+                  />
+                  <q-btn
+                    color="primary"
+                    label="Guardar"
+                    type="submit"
+                    :disable="isLoadingClientData"
+                  />
+                </div>
+              </div>
+            </q-form>
+          </div>
+        </q-card-section>
       </q-card>
     </q-dialog>
   </q-page>
@@ -200,61 +345,17 @@ import { ref, computed } from "vue";
 import { useStore } from "vuex";
 import { useQuasar } from "quasar";
 import { positiveMessage, negativeMessage } from "../composable/light-notify";
+import {
+  validateText,
+  validateEmail,
+  validateNumber,
+} from "../composable/validation-input";
+import { columnsForContacts } from "../composable/column-tables";
 
 import ClientDataSkeleton from "../components/Skeletons/ClientData.vue";
 import ContactsClientData from "../components/Skeletons/ContactsClientData.vue";
 
-const columns = [
-  {
-    name: "id",
-    required: true,
-    label: "ID",
-    align: "left",
-    field: (row) => row.id,
-    format: (val) => `${val}`, // sorting format
-    sortable: true,
-  },
-  {
-    name: "name",
-    required: true,
-    label: "Nombre",
-    align: "left",
-    field: (row) => `${row.name} ${row.lastName}`,
-    sortable: true,
-  },
-  {
-    name: "telephone",
-    required: true,
-    label: "Teléfono",
-    align: "left",
-    field: (row) => row.telephone,
-    sortable: true,
-  },
-  {
-    name: "email",
-    require: true,
-    label: "Correo Electronico",
-    align: "left",
-    field: (row) => row.email,
-    sortable: true,
-  },
-  {
-    name: "company",
-    required: true,
-    label: "Compañia",
-    align: "left",
-    field: (row) => row.company,
-    sortable: true,
-  },
-  {
-    name: "city",
-    required: true,
-    label: "Región/Pais",
-    align: "left",
-    field: (row) => `${row.city} - ${row.country}`,
-    sortable: true,
-  },
-];
+const columns = columnsForContacts;
 
 export default {
   props: {
@@ -278,6 +379,18 @@ export default {
     const rowCount = ref(5);
     const contactPerClientRow = ref([]);
     const isModifyDialogOpen = ref(false);
+
+    const nameContact = ref(null);
+    const lastNameContact = ref(null);
+    const emailContact = ref(null);
+    const companyContact = ref(null);
+    const addressOneContact = ref(null);
+    const addressTwoContact = ref(null);
+    const telephoneContact = ref(null);
+    const cityContact = ref(null);
+    const countryContact = ref(null);
+    const positionContact = ref(null);
+    const domainContact = ref(null);
 
     const isDarkModeActive = computed(() => $q.dark.isActive);
 
@@ -313,7 +426,56 @@ export default {
       }
     }
 
-    function onClick() {
+    function onOpenEditDialog(data) {
+      if (data) {
+        nameContact.value = data.name;
+        lastNameContact.value = data.lastName;
+        telephoneContact.value = data.telephone;
+        positionContact.value = data.position;
+        emailContact.value = data.email;
+        companyContact.value = data.company;
+        addressOneContact.value = data.addressOne;
+        addressTwoContact.value = data.addressTwo;
+        cityContact.value = data.city;
+        countryContact.value = data.country;
+        domainContact.value = data.webDomain;
+      }
+      isModifyDialogOpen.value = !isModifyDialogOpen.value;
+    }
+
+    function onSubmit() {
+      const dataToSubmit = {
+        name: nameContact.value,
+        lastName: lastNameContact.value,
+        telephone: telephoneContact.value,
+        position: positionContact.value,
+        email: emailContact.value,
+        company: companyContact.value,
+        addressOne: addressOneContact.value,
+        addressTwo: addressTwoContact.value,
+        city: cityContact.value,
+        country: countryContact.value,
+        webDomain: domainContact.value,
+        ownerId: currentId.value,
+      };
+      console.log("is Sumitting", dataToSubmit);
+    }
+
+    function onReset() {
+      nameContact.value = null;
+      emailContact.value = null;
+      companyContact.value = null;
+      addressOneContact.value = null;
+      addressTwoContact.value = null;
+      telephoneContact.value = null;
+      positionContact.value = null;
+      cityContact.value = null;
+      countryContact.value = null;
+      domainContact.value = null;
+    }
+
+    function onCancel() {
+      onReset();
       isModifyDialogOpen.value = !isModifyDialogOpen.value;
     }
 
@@ -323,7 +485,10 @@ export default {
       clientNIT,
       clientAddress,
       isLoadingClientData,
-      onClick,
+      onOpenEditDialog,
+      onSubmit,
+      onReset,
+      onCancel,
       isDarkModeActive,
       isModifyDialogOpen,
 
@@ -332,6 +497,22 @@ export default {
       rowCount,
       columns,
       contactPerClientRow,
+
+      validateText,
+      validateEmail,
+      validateNumber,
+
+      nameContact,
+      lastNameContact,
+      emailContact,
+      companyContact,
+      addressOneContact,
+      addressTwoContact,
+      telephoneContact,
+      cityContact,
+      countryContact,
+      positionContact,
+      domainContact,
     };
   },
 };
