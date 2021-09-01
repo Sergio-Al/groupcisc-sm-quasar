@@ -232,12 +232,6 @@ export default {
       loading.value = true;
       try {
         await $store.dispatch("usersModule/requestUsersData");
-        $q.notify({
-          name: "Éxito",
-          caption: "Los datos se han cargado correctamente",
-          color: "positive",
-          icon: "check_circle",
-        });
         loading.value = false;
         rows.value = $store.state.usersModule.users;
       } catch (error) {
@@ -255,7 +249,6 @@ export default {
     }
 
     function openEditDialog(data) {
-      console.log("this is clicked!", data);
       titleDialog.value = "Modificar Usuario: " + data.id;
       idSelected.value = data.id;
       nameSelected.value = data.name;
@@ -282,7 +275,6 @@ export default {
     }
 
     function onReset() {
-      console.log("you're resetting this form!");
       titleDialog.value = null;
       titleDeleteDialog.value = null;
       idSelected.value = null;
@@ -292,13 +284,13 @@ export default {
     }
 
     async function onSubmit() {
-      console.log("Your values going here!");
       isLoadingForm.value = true;
       try {
         await $store.dispatch("usersModule/updateUserData", {
           id: idSelected.value,
           name: nameSelected.value,
           email: emailSelected.value,
+          role: roleSelected.value,
         });
         positiveMessage("Éxito", "Se modificaron los datos para el usuario");
         isLoadingForm.value = false;
@@ -326,7 +318,6 @@ export default {
         onReset();
         getUserData();
       } catch (error) {
-        console.log(error);
         negativeMessage("Error", "Hubo un error al eliminar al usuario");
         isLoadingForm.value = false;
       }

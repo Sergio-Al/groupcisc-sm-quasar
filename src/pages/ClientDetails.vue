@@ -58,7 +58,7 @@
             icon="person_add"
             class="create-button"
             label="Crear Nuevo"
-            @click="onOpenEditDialog"
+            @click="onOpenEditDialog()"
           />
         </div>
       </div>
@@ -138,6 +138,12 @@
                     color="accent"
                     icon="delete"
                     round
+                    @click="
+                      onOpenDeleteDialog(
+                        props.row.id,
+                        `${props.row.name} ${props.row.lastName}`
+                      )
+                    "
                   >
                     <q-tooltip> Eliminar </q-tooltip>
                   </q-btn>
@@ -337,6 +343,36 @@
         </q-card-section>
       </q-card>
     </q-dialog>
+    <q-dialog v-model="isDeleteDialogOpen" persistent>
+      <q-card>
+        <q-card-section class="bg-accent text-white">
+          <div class="text-h6">Eliminar contacto {{ idToDelete }}</div>
+        </q-card-section>
+        <q-card-section class="row items-center">
+          <q-avatar icon="warning" color="accent" text-color="white" />
+          <span class="q-ml-sm">
+            ¿Seguro que quiere eliminar a
+            <span class="text-weight-bold">{{ nameContactToDelete }}? </span>
+          </span>
+        </q-card-section>
+        <q-card-actions align="right">
+          <q-btn
+            flat
+            :disabled="isLoadingClientData"
+            label="Cancelar"
+            color="primary"
+            @Click="onCloseDeleteDialog"
+          />
+          <q-btn
+            flat
+            :disabled="isLoadingClientData"
+            label="Eliminar"
+            color="primary"
+            @click="onConfirmDeleteContact"
+          />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
@@ -379,7 +415,9 @@ export default {
     const rowCount = ref(5);
     const contactPerClientRow = ref([]);
     const isModifyDialogOpen = ref(false);
+    const dialogStatus = ref(null);
 
+    const idContact = ref(null);
     const nameContact = ref(null);
     const lastNameContact = ref(null);
     const emailContact = ref(null);
@@ -391,6 +429,10 @@ export default {
     const countryContact = ref(null);
     const positionContact = ref(null);
     const domainContact = ref(null);
+
+    const isDeleteDialogOpen = ref(false);
+    const idToDelete = ref(null);
+    const nameContactToDelete = ref(null);
 
     const isDarkModeActive = computed(() => $q.dark.isActive);
 
@@ -406,8 +448,6 @@ export default {
         await $store.dispatch("contactsModule/requestContactsPerClient", {
           id: currentId.value,
         });
-
-        positiveMessage("Éxito", "Datos del cliente cargados correctamente");
 
         isLoadingClientData.value = false;
 
@@ -428,6 +468,7 @@ export default {
 
     function onOpenEditDialog(data) {
       if (data) {
+        idContact.value = data.id;
         nameContact.value = data.name;
         lastNameContact.value = data.lastName;
         telephoneContact.value = data.telephone;
@@ -439,11 +480,17 @@ export default {
         cityContact.value = data.city;
         countryContact.value = data.country;
         domainContact.value = data.webDomain;
+        dialogStatus.value = "update";
+        isModifyDialogOpen.value = !isModifyDialogOpen.value;
+        return;
       }
+      dialogStatus.value = "create";
       isModifyDialogOpen.value = !isModifyDialogOpen.value;
     }
 
-    function onSubmit() {
+    async function onSubmit() {
+      let operation = null;
+      let messageToDisplay = null;
       const dataToSubmit = {
         name: nameContact.value,
         lastName: lastNameContact.value,
@@ -456,13 +503,39 @@ export default {
         city: cityContact.value,
         country: countryContact.value,
         webDomain: domainContact.value,
-        ownerId: currentId.value,
+        ownerId: Number(currentId.value),
       };
-      console.log("is Sumitting", dataToSubmit);
+
+      isLoadingClientData.value = true;
+      if (dialogStatus.value === "create") {
+        operation = "contactsModule/createContactPerClient";
+        messageToDisplay = "Se ha creado un nuevo contacto";
+      } else if (dialogStatus.value === "update") {
+        dataToSubmit.id = idContact.value;
+        operation = "contactsModule/updateContactPerClient";
+        messageToDisplay = `Se ha modificado el contacto con id ${idContact.value}`;
+      } else {
+        return;
+      }
+      try {
+        await $store.dispatch(operation, dataToSubmit);
+        positiveMessage("Correcto", messageToDisplay);
+        isLoadingClientData.value = false;
+        isModifyDialogOpen.value = !isModifyDialogOpen.value;
+        onReset();
+        setupClientData();
+        return;
+      } catch (error) {
+        negativeMessage("Error", "Ha ocurrido un error al crear un contacto");
+        isLoadingClientData.value = false;
+        return;
+      }
     }
 
     function onReset() {
+      idContact.value = null;
       nameContact.value = null;
+      lastNameContact.value = null;
       emailContact.value = null;
       companyContact.value = null;
       addressOneContact.value = null;
@@ -472,11 +545,46 @@ export default {
       cityContact.value = null;
       countryContact.value = null;
       domainContact.value = null;
+      dialogStatus.value = null;
     }
 
     function onCancel() {
       onReset();
       isModifyDialogOpen.value = !isModifyDialogOpen.value;
+    }
+
+    function onOpenDeleteDialog(id, name) {
+      idToDelete.value = id;
+      nameContactToDelete.value = name;
+      isDeleteDialogOpen.value = !isDeleteDialogOpen.value;
+    }
+
+    function onCloseDeleteDialog() {
+      isDeleteDialogOpen.value = !isDeleteDialogOpen.value;
+      idToDelete.value = null;
+      nameContactToDelete.value = null;
+    }
+
+    async function onConfirmDeleteContact() {
+      isLoadingClientData.value = true;
+      try {
+        await $store.dispatch("contactsModule/deleteContactPerClient", {
+          id: idToDelete.value,
+        });
+        positiveMessage(
+          "Correcto",
+          `Se ha eliminado correctamente al usuario con ID ${idToDelete.value}`
+        );
+        isLoadingClientData.value = false;
+        setupClientData();
+        onCloseDeleteDialog();
+      } catch (error) {
+        negativeMessage(
+          "Error",
+          `No se ha podido eliminar el Contacto ${idToDelete.value}`
+        );
+        isLoadingClientData.value = false;
+      }
     }
 
     return {
@@ -491,6 +599,13 @@ export default {
       onCancel,
       isDarkModeActive,
       isModifyDialogOpen,
+
+      onOpenDeleteDialog,
+      isDeleteDialogOpen,
+      onCloseDeleteDialog,
+      idToDelete,
+      nameContactToDelete,
+      onConfirmDeleteContact,
 
       loading,
       filter,

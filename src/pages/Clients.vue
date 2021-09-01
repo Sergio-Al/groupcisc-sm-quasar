@@ -261,7 +261,6 @@ export default {
       loading.value = true;
       try {
         await $store.dispatch("clientsModule/requestAllClients");
-        positiveMessage("Éxito", "Los datos se cargaron correctamente");
         loading.value = false;
         rows.value = $store.state.clientsModule.clients;
       } catch (error) {
