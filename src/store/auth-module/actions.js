@@ -1,4 +1,4 @@
-import { connection } from "src/composable/utils";
+import { getTokenFromStorage } from "src/composable/utils";
 import { LocalStorage, SessionStorage } from "quasar";
 import { api } from "boot/axios";
 
@@ -47,6 +47,38 @@ export default {
         userRole,
         token,
       });
+    }
+  },
+  async getUserProfile({ commit }) {
+    const response = await api.get("/userProfile", {
+      headers: {
+        Authorization: getTokenFromStorage(),
+      },
+    });
+
+    if (response.status !== 200) {
+      throw new Error(
+        response.message || "Ha ocurrido un error al capturar los datos"
+      );
+    }
+
+    commit("setUserDataToModify", {
+      userName: response.data.name,
+      userMail: response.data.email,
+      userRole: response.data.role,
+    });
+  },
+  async updateUserProfileData({ commit }, payload) {
+    const response = await api.patch("/userProfile", payload, {
+      headers: {
+        Authorization: getTokenFromStorage(),
+      },
+    });
+
+    if (response.status !== 200) {
+      throw new Error(
+        response.message || "Hubo un error al modificar los datos"
+      );
     }
   },
 };

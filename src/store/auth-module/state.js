@@ -3,6 +3,7 @@ export default function () {
     isOnLoggin: true,
     userId: null,
     userName: null,
+    userMail: null,
     userRole: null,
     token: null,
     userProfileData: null,
