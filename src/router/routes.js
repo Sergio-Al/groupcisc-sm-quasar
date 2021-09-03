@@ -36,16 +36,25 @@ const routes = [
         component: () => import("pages/Options.vue"),
       },
     ],
+    meta: {
+      requiresAuth: true,
+    }
   },
   {
     path: "/sign-up",
     name: "SignUp",
     component: () => import("layouts/SignUpPage.vue"),
+    meta: {
+      requiresUnauth: true,
+    }
   },
   {
     path: "/login",
     name: "Login",
     component: () => import("layouts/LoginLayout.vue"),
+    meta: {
+      requiresUnauth: true,
+    }
   },
 
   // Always leave this as last one,

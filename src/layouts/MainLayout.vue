@@ -28,12 +28,12 @@
       bordered
       content-class="bg-secondary"
     >
-      <q-img
+      <div
         class="absolute-top text-secondary"
         style="box-sizing: border-box; height: 144px"
       >
-        <div class="absolute-bottom bg-transparent">
-          <q-avatar size="40px" class="q-mb-sm">
+        <div class="absolute-bottom bg-transparent flex column q-py-md q-px-lg">
+          <q-avatar size="40px" class="q-mb-sx">
             <img src="https://cdn.quasar.dev/img/boy-avatar.png" />
           </q-avatar>
           <div
@@ -42,8 +42,9 @@
           >
             {{ userName }}
           </div>
+          <div class="text-caption role-text">{{ userRole }}</div>
         </div>
-      </q-img>
+      </div>
       <q-scroll-area
         style="
           height: calc(100% - 150px);
@@ -115,11 +116,47 @@
             exact
           >
             <q-item-section avatar>
-              <q-icon name="settings" />
+              <q-icon name="account_box" />
             </q-item-section>
 
-            <q-item-section> Acciones </q-item-section>
+            <q-item-section> Perfil </q-item-section>
           </q-item>
+
+          <q-expansion-item expand-separator icon="settings" label="Opciones">
+            <q-card>
+              <q-card-section class="q-ma-none">
+                <div class="column wrap q-pa-none justify-center">
+                  <div class="row">
+                    <q-toggle
+                      v-model="isNightMode"
+                      checked-icon="dark_mode"
+                      size="lg"
+                      :label="isNightMode ? 'Modo Noche: Si' : 'Modo Noche: No'"
+                      unchecked-icon="light_mode"
+                    />
+                  </div>
+
+                  <div class="row items-center q-mt-lg">
+                    <q-icon size="xl" name="person_outline" />
+
+                    <div class="column q-ml-lg">
+                      <div class="text-subtitle1 q-mt-md q-mb-xs">
+                        {{ userName }}
+                      </div>
+
+                      <q-btn
+                        color="primary"
+                        label="Cerrar Sesión"
+                        push
+                        size="sm"
+                        @click="onLogoutDialog"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </q-card-section>
+            </q-card>
+          </q-expansion-item>
         </q-list>
       </q-scroll-area>
     </q-drawer>
@@ -127,6 +164,24 @@
     <q-page-container>
       <router-view />
     </q-page-container>
+    <q-dialog v-model="isLogoutDialogOpen" persistent>
+      <q-card>
+        <q-card-section class="row items-center">
+          <q-avatar icon="logout" color="primary" text-color="white" />
+          <span class="q-ml-sm">¿Estas seguro de cerrar la sesión?</span>
+        </q-card-section>
+
+        <q-card-actions align="right">
+          <q-btn label="Cancelar" color="primary" v-close-popup />
+          <q-btn
+            outline
+            label="Cerrar Sesión"
+            color="primary"
+            @click="onLogout"
+          />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </q-layout>
 </template>
 
@@ -134,10 +189,12 @@
 <script>
 // import EssentialLink from "components/EssentialLink.vue";
 
-import { defineComponent, ref, computed, onMounted } from "vue";
+import { defineComponent, ref, computed, onMounted, watch } from "vue";
 import { useQuasar } from "quasar";
 import { useStore } from "vuex";
+import { useRouter } from "vue-router";
 import { notifyMessage } from "../composable/utils";
+import { negativeMessage } from "../composable/light-notify";
 
 export default defineComponent({
   name: "MainLayout",
@@ -147,22 +204,51 @@ export default defineComponent({
   setup() {
     const $q = useQuasar();
     const $store = useStore();
+    const $router = useRouter();
 
+    const isNightMode = ref($q.dark.isActive);
     const leftDrawerOpen = ref(false);
     const componentSelected = ref("principal");
+    const isLogoutDialogOpen = ref(false);
 
     const isMyComponent = (componentName) =>
       componentName === componentSelected.value;
+
+    watch(isNightMode, (newValue) => {
+      $q.dark.set(newValue);
+      $q.localStorage.set("isDarkMode", newValue);
+    });
 
     function selectComponent(componentName) {
       componentSelected.value = componentName;
     }
 
+    function onLogoutDialog() {
+      isLogoutDialogOpen.value = !isLogoutDialogOpen.value;
+    }
+
+    async function onLogout() {
+      try {
+        await $store.dispatch("authModule/logout");
+        $router.replace("/login");
+      } catch (error) {
+        negativeMessage(
+          "Error",
+          "Ha ocurrido un error al realizar la operación"
+        );
+      }
+    }
+
     return {
-      userName: computed(() => $store.getters["authModule/getUserName"]),
+      isNightMode,
       leftDrawerOpen,
-      isMyComponent,
+      isLogoutDialogOpen,
+      onLogoutDialog,
+      onLogout,
       selectComponent,
+      isMyComponent,
+      userName: computed(() => $store.getters["authModule/getUserName"]),
+      userRole: computed(() => $store.getters["authModule/getUserRole"]),
       toggleLeftDrawer() {
         leftDrawerOpen.value = !leftDrawerOpen.value;
       },
@@ -174,6 +260,10 @@ export default defineComponent({
 <style lang="scss" scoped>
 * {
   transition: 0.1s all ease-in;
+}
+
+.role-text {
+  color: black;
 }
 
 .q-toolbar {
@@ -216,6 +306,9 @@ export default defineComponent({
 }
 
 .body--dark {
+  .role-text {
+    color: white;
+  }
   .q-drawer {
     .title {
       color: $primary-dark-text;

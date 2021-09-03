@@ -1,5 +1,5 @@
 import { getTokenFromStorage } from "src/composable/utils";
-import { LocalStorage, SessionStorage } from "quasar";
+import { LocalStorage, Dark } from "quasar";
 import { api } from "boot/axios";
 
 function setUpData(commit, responseData) {
@@ -7,6 +7,7 @@ function setUpData(commit, responseData) {
   LocalStorage.set("userId", responseData.data.user.id);
   LocalStorage.set("userRole", responseData.data.user.role);
   LocalStorage.set("userName", responseData.data.user.name);
+  LocalStorage.set("isDarkMode", Dark.isActive);
 
   commit("setUserData", {
     token: responseData.data.token,
@@ -80,5 +81,30 @@ export default {
         response.message || "Hubo un error al modificar los datos"
       );
     }
+  },
+  async logout({ commit }) {
+    const response = await api.post("/users/logout", null, {
+      headers: {
+        Authorization: getTokenFromStorage(),
+      },
+    });
+
+    console.log("when you give me those ocean eyes");
+
+    if (response.status !== 200) {
+      throw new Error("Ha ocurrido un error al realizar la operacion");
+    }
+
+    LocalStorage.remove("token");
+    LocalStorage.remove("userId");
+    LocalStorage.remove("userName");
+    LocalStorage.remove("userRole");
+
+    commit("setUserData", {
+      token: null,
+      userId: null,
+      userName: null,
+      userRole: null,
+    });
   },
 };
