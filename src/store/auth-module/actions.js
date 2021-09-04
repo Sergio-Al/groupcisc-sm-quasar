@@ -17,6 +17,20 @@ function setUpData(commit, responseData) {
   });
 }
 
+function removeData(commit) {
+  LocalStorage.remove("token");
+  LocalStorage.remove("userId");
+  LocalStorage.remove("userName");
+  LocalStorage.remove("userRole");
+
+  commit("setUserData", {
+    token: null,
+    userId: null,
+    userName: null,
+    userRole: null,
+  });
+}
+
 export default {
   async signUpUser({ commit }, payload) {
     console.log(payload);
@@ -95,16 +109,6 @@ export default {
       throw new Error("Ha ocurrido un error al realizar la operacion");
     }
 
-    LocalStorage.remove("token");
-    LocalStorage.remove("userId");
-    LocalStorage.remove("userName");
-    LocalStorage.remove("userRole");
-
-    commit("setUserData", {
-      token: null,
-      userId: null,
-      userName: null,
-      userRole: null,
-    });
+    removeData(commit);
   },
 };

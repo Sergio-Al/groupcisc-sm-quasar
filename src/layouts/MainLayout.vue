@@ -190,11 +190,12 @@
 // import EssentialLink from "components/EssentialLink.vue";
 
 import { defineComponent, ref, computed, onMounted, watch } from "vue";
-import { useQuasar } from "quasar";
+import { LocalStorage, useQuasar } from "quasar";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
-import { notifyMessage } from "../composable/utils";
-import { negativeMessage } from "../composable/light-notify";
+import { api } from "boot/axios";
+import { notifyMessage, getTokenFromStorage } from "../composable/utils";
+import { positiveMessage, negativeMessage } from "../composable/light-notify";
 
 export default defineComponent({
   name: "MainLayout",
@@ -218,6 +219,25 @@ export default defineComponent({
       $q.dark.set(newValue);
       $q.localStorage.set("isDarkMode", newValue);
     });
+
+    verifyValidSession();
+
+    async function verifyValidSession() {
+      try {
+        await api.get("/userProfile", {
+          headers: {
+            Authorization: getTokenFromStorage(),
+          },
+        });
+      } catch (error) {
+        if (error.response.status === 401) {
+          $q.localStorage.clear();
+          $router.replace("/login");
+          return;
+        }
+        negativeMessage("Error", "Ha ocurrido un error al cargar los datos");
+      }
+    }
 
     function selectComponent(componentName) {
       componentSelected.value = componentName;

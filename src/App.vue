@@ -13,7 +13,9 @@ export default defineComponent({
     const $store = useStore();
     onMounted(() => {
       $store.dispatch("authModule/tryLoggin");
-      $q.dark.set($q.localStorage.getItem("isDarkMode"));
+      if ($q.localStorage.getItem("isDarkMode")) {
+        $q.dark.set($q.localStorage.getItem("isDarkMode"));
+      }
       // setTimeout(() => {
       //   $q.dark.toggle();
       // }, 5000);
