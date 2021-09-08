@@ -187,6 +187,7 @@ export default {
       const dataToSend = {
         name: name.value,
         email: email.value,
+        role: role.value,
       };
 
       if (isEditingPassword.value) {

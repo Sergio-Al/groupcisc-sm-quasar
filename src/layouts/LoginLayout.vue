@@ -56,6 +56,10 @@
               >Registrarse</router-link
             >
           </p>
+          <p>
+            ¿Olvido su contraseña?
+            <router-link class="text-link" to="/recover">Recuperar</router-link>
+          </p>
         </div>
       </q-form>
     </div>

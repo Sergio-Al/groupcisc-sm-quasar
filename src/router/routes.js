@@ -56,6 +56,14 @@ const routes = [
       requiresUnauth: true,
     }
   },
+  {
+    path: "/recover",
+    name: "RecoverAccount",
+    component: () => import("layouts/RecoverAccount.vue"),
+    meta: {
+      requiresUnAuth: true,
+    }
+  },
 
   // Always leave this as last one,
   // but you can also remove it

@@ -111,4 +111,11 @@ export default {
 
     removeData(commit);
   },
+  async recoverAccount({ commit }, payload) {
+    console.log("this is the mail", payload.email);
+    const response = await api.post("/resetpassword", payload);
+    if (response.status !== 200) {
+      throw new Error(response.message || "Ha ocurrido un error en el proceso");
+    }
+  },
 };
