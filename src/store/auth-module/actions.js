@@ -95,6 +95,9 @@ export default {
         response.message || "Hubo un error al modificar los datos"
       );
     }
+    console.log(payload);
+    LocalStorage.set("userName", payload.name);
+    LocalStorage.set("userRole", payload.role);
   },
   async logout({ commit }) {
     const response = await api.post("/users/logout", null, {

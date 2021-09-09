@@ -41,6 +41,9 @@
             style="font-size: 20px; margin-top: 20px"
           >
             {{ userName }}
+            <q-tooltip :delay="1000">
+              {{ userMail }}
+            </q-tooltip>
           </div>
           <div class="text-caption role-text">{{ userRole }}</div>
         </div>
@@ -78,6 +81,7 @@
             active-class="item-active"
             v-ripple
             exact
+            v-if="$store.state.authModule.userRole !== 'USER'"
           >
             <q-item-section avatar>
               <q-icon name="assignment" />
@@ -224,14 +228,11 @@ export default defineComponent({
 
     async function verifyValidSession() {
       try {
-        await api.get("/userProfile", {
-          headers: {
-            Authorization: getTokenFromStorage(),
-          },
-        });
+        await $store.dispatch("authModule/getUserProfile");
       } catch (error) {
         if (error.response.status === 401) {
           $q.localStorage.clear();
+          negativeMessage("Error", "Problema de autenticación");
           $router.replace("/login");
           return;
         }
@@ -269,6 +270,7 @@ export default defineComponent({
       isMyComponent,
       userName: computed(() => $store.getters["authModule/getUserName"]),
       userRole: computed(() => $store.getters["authModule/getUserRole"]),
+      userMail: computed(() => $store.getters["authModule/getUserMail"]),
       toggleLeftDrawer() {
         leftDrawerOpen.value = !leftDrawerOpen.value;
       },
@@ -297,6 +299,7 @@ export default defineComponent({
 .q-drawer {
   .title {
     color: black;
+    cursor: default;
   }
   .q-list {
     padding: 0 0.4rem;

@@ -119,7 +119,10 @@
                 <q-td v-for="col in props.cols" :key="col.name" :props="props">
                   {{ col.value }}
                 </q-td>
-                <q-td auto-width>
+                <q-td
+                  v-if="$store.state.authModule.userRole !== 'USER'"
+                  auto-width
+                >
                   <q-btn
                     :outline="isDarkModeActive"
                     size="sm"
@@ -138,6 +141,7 @@
                     color="accent"
                     icon="delete"
                     round
+                    v-if="$store.state.authModule.userRole === 'SUPERADMIN'"
                     @click="
                       onOpenDeleteDialog(
                         props.row.id,

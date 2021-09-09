@@ -69,7 +69,9 @@
                       color="primary"
                       icon="folder"
                       round
-                    />
+                    >
+                      <q-tooltip> Ver Contactos </q-tooltip>
+                    </q-btn>
                     <q-btn
                       :outline="isDarkModeActive"
                       size="sm"
@@ -78,7 +80,10 @@
                       icon="edit"
                       round
                       @click="openEditDialog(props.row)"
-                    />
+                      v-if="$store.state.authModule.userRole !== 'USER'"
+                    >
+                      <q-tooltip> Editar </q-tooltip>
+                    </q-btn>
                     <q-btn
                       :outline="isDarkModeActive"
                       size="sm"
@@ -87,7 +92,10 @@
                       icon="delete"
                       round
                       @click="displayDeleteDialog(props.row.id)"
-                    />
+                      v-if="$store.state.authModule.userRole === 'SUPERADMIN'"
+                    >
+                      <q-tooltip> Eliminar </q-tooltip>
+                    </q-btn>
                   </q-td>
                 </q-tr>
                 <q-tr v-show="props.expand" :props="props">

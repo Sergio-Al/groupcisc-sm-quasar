@@ -47,7 +47,10 @@
                   >
                     {{ col.value }}
                   </q-td>
-                  <q-td auto-width>
+                  <q-td
+                    v-if="$store.state.authModule.userRole === 'SUPERADMIN'"
+                    auto-width
+                  >
                     <q-btn
                       :outline="isDarkModeActive"
                       size="sm"
@@ -345,7 +348,7 @@ export default {
       onReset,
       onSubmit,
       deleteUser,
-      
+
       columns,
       rows,
 
