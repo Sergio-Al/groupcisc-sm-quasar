@@ -507,7 +507,7 @@ export default {
         city: cityContact.value,
         country: countryContact.value,
         webDomain: domainContact.value,
-        ownerId: Number(currentId.value),
+        ownerId: currentId.value,
       };
 
       isLoadingClientData.value = true;

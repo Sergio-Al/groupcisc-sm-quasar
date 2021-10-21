@@ -34,7 +34,11 @@
       >
         <div class="absolute-bottom bg-transparent flex column q-py-md q-px-lg">
           <q-avatar size="40px" class="q-mb-sx">
-            <img src="https://cdn.quasar.dev/img/boy-avatar.png" />
+            <q-icon
+              :name="userIcon"
+              class="avatar-icon"
+              style="font-size: 2.5rem"
+            />
           </q-avatar>
           <div
             class="text-weight-bold title"
@@ -271,6 +275,13 @@ export default defineComponent({
       userName: computed(() => $store.getters["authModule/getUserName"]),
       userRole: computed(() => $store.getters["authModule/getUserRole"]),
       userMail: computed(() => $store.getters["authModule/getUserMail"]),
+      userIcon: computed(() =>
+        $store.getters["authModule/getUserRole"] === "SUPERADMIN"
+          ? "admin_panel_settings"
+          : $store.getters["authModule/getUserRole"] === "ADMIN"
+          ? "assignment_ind"
+          : "person"
+      ),
       toggleLeftDrawer() {
         leftDrawerOpen.value = !leftDrawerOpen.value;
       },
@@ -285,6 +296,10 @@ export default defineComponent({
 }
 
 .role-text {
+  color: black;
+}
+
+.avatar-icon {
   color: black;
 }
 
@@ -332,6 +347,11 @@ export default defineComponent({
   .role-text {
     color: white;
   }
+
+  .avatar-icon {
+    color: white;
+  }
+
   .q-drawer {
     .title {
       color: $primary-dark-text;

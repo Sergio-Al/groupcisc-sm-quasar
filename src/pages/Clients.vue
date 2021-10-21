@@ -123,6 +123,17 @@
         <q-card-section class="q-pt-none">
           <div>
             <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-md">
+               <q-input
+                class="q-mb-xs"
+                :disable="isLoadingForm"
+                v-model.trim="idField"
+                type="text"
+                outlined
+                label="ID"
+                :rules="[
+                  (val) => (val && val.toString().length > 0) || 'Ingresa un ID',
+                ]"
+              />
               <q-input
                 class="q-mb-xs"
                 :disable="isLoadingForm"
@@ -141,10 +152,6 @@
                 type="number"
                 outlined
                 label="NIT"
-                :rules="[
-                  (val) =>
-                    (val && val.toString().length > 0) || 'Ingresa un NIT',
-                ]"
               />
               <q-input
                 class="q-mb-xs"
@@ -250,10 +257,12 @@ export default {
     // end test variables for table
 
     const titleDialog = ref("");
+    const idField = ref("");
     const nameField = ref("");
     const nitField = ref(null);
     const addressField = ref("");
     const statusDialog = ref("");
+    const idClientToUpdate = ref("");
 
     const fetchedDataInfo = ref({});
     const isConfirmingDelete = ref(false);
@@ -304,10 +313,12 @@ export default {
       isDialogOpen.value = !isDialogOpen.value;
       if (data) {
         titleDialog.value = `Modificar usuario ${data.id}`;
+        idField.value = data.id;
         nameField.value = data.name;
         nitField.value = Number(data.nit);
         addressField.value = data.address;
         statusDialog.value = "modify";
+        idClientToUpdate.value = data.id;
         captureDataFromIndex(data.id);
         return;
       }
@@ -321,6 +332,7 @@ export default {
       if (statusDialog.value === "create") {
         try {
           await $store.dispatch("clientsModule/createClient", {
+            id: idField.value,
             name: nameField.value,
             nit: Number(nitField.value),
             address: addressField.value,
@@ -339,13 +351,17 @@ export default {
         try {
           await $store.dispatch("clientsModule/modifyClient", {
             id: fetchedDataInfo.value.id,
-            name: nameField.value,
-            nit: Number(nitField.value),
-            address: addressField.value,
+            data: {
+              id: idField.value,
+              name: nameField.value,
+              nit: Number(nitField.value),
+              address: addressField.value,
+            },
           });
           positiveMessage("Éxito", "Se actualizaron los datos correctamente");
           isLoadingForm.value = false;
           isDialogOpen.value = false;
+          onReset();
           setupClients();
         } catch (error) {
           negativeMessage("Error", "Hubo un error al modificar los datos");
@@ -357,6 +373,7 @@ export default {
     }
 
     function onReset() {
+      idField.value = "";
       nameField.value = "";
       nitField.value = "";
       addressField.value = "";
@@ -388,6 +405,7 @@ export default {
       isDialogOpen,
       addressTest,
       titleDialog,
+      idField,
       nameField,
       nitField,
       addressField,
@@ -403,5 +421,5 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@use '../css/table-pages.scss';
+@use "../css/table-pages.scss";
 </style>

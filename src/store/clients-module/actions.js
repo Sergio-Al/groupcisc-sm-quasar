@@ -53,7 +53,7 @@ export default {
     }
   },
   async modifyClient({ commit }, payload) {
-    const response = await api.patch(`/clients/${payload.id}`, payload, {
+    const response = await api.patch(`/clients/${payload.id}`, payload.data, {
       headers: {
         Authorization: getTokenFromStorage(),
       },
