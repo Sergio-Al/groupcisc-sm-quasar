@@ -35,6 +35,43 @@ const columnsForClients = [
     sortable: true,
   },
 ];
+const columnsForSuppliers = [
+  {
+    name: "id",
+    required: true,
+    label: "ID",
+    align: "left",
+    field: (row) => row.id,
+    format: (val) => `${val}`,
+    sortable: true,
+  },
+  {
+    name: "name",
+    required: true,
+    label: "Nombre",
+    align: "left",
+    field: (row) => row.name,
+    format: (val) => `${val}`,
+    sortable: true,
+  },
+  {
+    name: "nit",
+    required: true,
+    label: "NIT",
+    align: "left",
+    field: (row) => row.nit,
+    format: (val) => `${val}`,
+    sortable: true,
+  },
+  {
+    name: "address",
+    required: true,
+    label: "Dirección",
+    align: "left",
+    field: (row) => row.address,
+    sortable: true,
+  },
+];
 
 const columnsForUsers = [
   {
@@ -125,4 +162,9 @@ const columnsForContacts = [
   },
 ];
 
-export { columnsForClients, columnsForUsers, columnsForContacts };
+export {
+  columnsForClients,
+  columnsForUsers,
+  columnsForContacts,
+  columnsForSuppliers,
+};

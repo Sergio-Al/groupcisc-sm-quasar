@@ -31,6 +31,11 @@ const routes = [
         component: () => import("pages/ClientDetails.vue"),
       },
       {
+        path: "suppliers",
+        name: "SystemSuppliers",
+        component: () => import("pages/Suppliers.vue"),
+      },
+      {
         path: "options",
         name: "SystemOptions",
         component: () => import("pages/Options.vue"),
@@ -38,7 +43,7 @@ const routes = [
     ],
     meta: {
       requiresAuth: true,
-    }
+    },
   },
   {
     path: "/sign-up",
@@ -46,7 +51,7 @@ const routes = [
     component: () => import("layouts/SignUpPage.vue"),
     meta: {
       requiresUnauth: true,
-    }
+    },
   },
   {
     path: "/login",
@@ -54,7 +59,7 @@ const routes = [
     component: () => import("layouts/LoginLayout.vue"),
     meta: {
       requiresUnauth: true,
-    }
+    },
   },
   {
     path: "/recover",
@@ -62,7 +67,7 @@ const routes = [
     component: () => import("layouts/RecoverAccount.vue"),
     meta: {
       requiresUnAuth: true,
-    }
+    },
   },
 
   // Always leave this as last one,

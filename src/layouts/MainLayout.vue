@@ -12,7 +12,7 @@
         />
 
         <q-toolbar-title class="text-weight-medium q-px-md q-pr-lg">
-          My-Company System
+          GroupCisc System
         </q-toolbar-title>
 
         <div>
@@ -110,6 +110,21 @@
             <q-item-section> clientes </q-item-section>
           </q-item>
 
+          <q-item
+            to="/system/suppliers"
+            clickable
+            :active="isMyComponent('proveedores')"
+            @click="selectComponent('proveedores')"
+            active-class="item-active"
+            v-ripple
+            exact
+          >
+            <q-item-section avatar>
+              <q-icon name="hail" />
+            </q-item-section>
+
+            <q-item-section> proveedores </q-item-section>
+          </q-item>
           <q-separator spaced />
 
           <q-item-label header>Opciones</q-item-label>
