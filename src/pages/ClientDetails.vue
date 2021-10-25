@@ -207,7 +207,7 @@
     <q-dialog v-model="isModifyDialogOpen" persistent>
       <q-card class="creation-card-big q-pa-sm">
         <q-card-section>
-          <div class="text-h6">TitleDialog</div>
+          <div class="text-h6">Edicion de Contacto</div>
         </q-card-section>
         <q-card-section class="text-center q-pa-none">
           <div class="text-h6">Ingrese los datos</div>
@@ -275,10 +275,9 @@
                     v-model.trim="telephoneContact"
                     label="Teléfono"
                     class="q-mb-xs"
-                    mask="(###)-##-###"
-                    hint="Formato: (###)-##-###"
+                    mask="##########"
+                    hint="Formato: ##########"
                     unmasked-value
-                    :rules="[validateNumber]"
                   />
                   <q-input
                     v-model.trim="cityContact"
@@ -428,7 +427,7 @@ export default {
     const companyContact = ref(null);
     const addressOneContact = ref(null);
     const addressTwoContact = ref(null);
-    const telephoneContact = ref(null);
+    const telephoneContact = ref("");
     const cityContact = ref(null);
     const countryContact = ref(null);
     const positionContact = ref(null);

@@ -5,6 +5,6 @@ export default function () {
     selectedSupplierName: null,
     selectedSupplierId: null,
     selectedSupplierNIT: null,
-    selectedClientAddress: null,
+    selectedSupplierAddress: null,
   };
 }

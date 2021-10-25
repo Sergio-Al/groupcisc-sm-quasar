@@ -94,7 +94,7 @@
             <template v-slot:header="props">
               <q-tr :props="props">
                 <q-th auto-width />
-                <q-th v-for="col in props.col" :key="col.name" :props="props">
+                <q-th v-for="col in props.cols" :key="col.name" :props="props">
                   {{ col.label }}
                 </q-th>
               </q-tr>
@@ -205,7 +205,7 @@
     <q-dialog v-model="isModifyDialogOpen" persistent>
       <q-card class="creation-card-big q-pa-sm">
         <q-card-section>
-          <div class="text-h6">TitleDialog</div>
+          <div class="text-h6">Edición de Contacto</div>
         </q-card-section>
         <q-card-section class="text-center q-pa-none">
           <div class="text-h6">Ingrese los datos</div>
@@ -271,12 +271,11 @@
                 <div class="col-xs-12 col-sm-6 q-pr-xs">
                   <q-input
                     class="q-mb-xs"
-                    hint="Formato: (###)-##-###"
+                    hint="Formato: ##########"
                     label="Teléfono"
-                    mask="(###)-##-###"
+                    mask="##########"
                     unmasked-value
                     v-model.trim="telephoneContact"
-                    :rules="[validateNumber]"
                   />
                   <q-input
                     class="q-mb-xs"
@@ -314,7 +313,7 @@
                   />
                 </div>
               </div>
-              <div class="flex justify-text">
+              <div class="flex justify-between">
                 <q-btn
                   class="q-ml-sm"
                   color="primary"
@@ -426,7 +425,7 @@ export default {
     const companyContact = ref(null);
     const addressOneContact = ref(null);
     const addressTwoContact = ref(null);
-    const telephoneContact = ref(null);
+    const telephoneContact = ref("");
     const cityContact = ref(null);
     const countryContact = ref(null);
     const positionContact = ref(null);

@@ -6,6 +6,6 @@ export default {
     state.selectedSupplierId = payload.id;
     state.selectedSupplierName = payload.name;
     state.selectedSupplierNIT = payload.nit;
-    state.selectedClientAddress = payload.address;
+    state.selectedSupplierAddress = payload.address;
   },
 };
