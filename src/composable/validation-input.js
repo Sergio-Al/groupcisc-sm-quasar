@@ -8,7 +8,7 @@ function validateEmail(value) {
 
 function validateNumber(value) {
   return (
-    (value && value.toString().length > 0 && value.toString().length === 8) ||
+    (value && value.toString().length > 0 && value.toString().length >= 7) ||
     "Debe ingresar un valor válido"
   );
 }

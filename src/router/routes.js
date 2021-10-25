@@ -36,6 +36,12 @@ const routes = [
         component: () => import("pages/Suppliers.vue"),
       },
       {
+        path: "suppliers/:id",
+        name: "SystemSuppliersDetails",
+        props: true,
+        component: () => import("pages/SupplierDetails.vue"),
+      },
+      {
         path: "options",
         name: "SystemOptions",
         component: () => import("pages/Options.vue"),
